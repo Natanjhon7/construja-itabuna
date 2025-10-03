@@ -2,53 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "*.html",
+      "src": "**/*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "auth/*.html",
+      "src": "**/*.css",
       "use": "@vercel/static"
     },
     {
-      "src": "css/*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "js/*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "supabase/*.js",
+      "src": "**/*.js",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/",
+      "src": "/(.*)",
       "dest": "/index.html"
-    },
-    {
-      "src": "/auth/(.*)",
-      "dest": "/auth/$1.html"
-    },
-    {
-      "src": "/(.*\\.(css|js|json|ico|png|jpg|jpeg|gif|svg))",
-      "dest": "/$1"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
-      ]
     }
   ]
 }
