@@ -16,6 +16,8 @@ function initAuthPage() {
         initLoginPage();
     } else if (currentPage === 'cadastro.html' || currentPage === 'cadastro') {
         initRegistrationPage();
+    } else if (currentPage === 'cadastro-profissional.html') {
+        initProfessionalRegistrationPage();
     }
 }
 
@@ -42,6 +44,19 @@ function initRegistrationPage() {
     
     // Adicionar animação de entrada
     const registerCard = document.querySelector('.max-w-md');
+    if (registerCard) {
+        registerCard.classList.add('animate-slide-in-up');
+    }
+}
+
+// Inicializar página de cadastro profissional
+function initProfessionalRegistrationPage() {
+    initFormValidation();
+    initPhoneMasks();
+    initCPFMask();
+    
+    // Adicionar animação de entrada
+    const registerCard = document.querySelector('.max-w-3xl');
     if (registerCard) {
         registerCard.classList.add('animate-slide-in-up');
     }
@@ -98,6 +113,7 @@ function switchToTab(tabType) {
 function initFormValidation() {
     const clientForm = document.getElementById('clientRegistrationForm');
     const professionalForm = document.getElementById('professionalRegistrationForm');
+    const professionalFullForm = document.getElementById('professionalRegistrationFullForm');
     
     if (clientForm) {
         clientForm.addEventListener('submit', handleClientRegistration);
@@ -106,10 +122,14 @@ function initFormValidation() {
     if (professionalForm) {
         professionalForm.addEventListener('submit', handleProfessionalRegistration);
     }
+    
+    if (professionalFullForm) {
+        professionalFullForm.addEventListener('submit', handleProfessionalFullRegistration);
+    }
 }
 
-// Handler para login
-function handleLogin(e) {
+// Handler para login - AGORA COM VERCELL AUTH
+async function handleLogin(e) {
     e.preventDefault();
     
     const formData = {
@@ -124,12 +144,12 @@ function handleLogin(e) {
         return;
     }
     
-    // Simular login
-    loginUser(formData);
+    // USAR VERCELL AUTH - CADASTRO REAL
+    await loginUser(formData);
 }
 
-// Handler para cadastro de cliente
-function handleClientRegistration(e) {
+// Handler para cadastro de cliente - AGORA COM VERCELL AUTH
+async function handleClientRegistration(e) {
     e.preventDefault();
     
     const formData = {
@@ -147,12 +167,12 @@ function handleClientRegistration(e) {
         return;
     }
     
-    // Simular cadastro
-    registerUser(formData);
+    // USAR VERCELL AUTH - CADASTRO REAL
+    await registerUser(formData);
 }
 
-// Handler para cadastro de profissional
-function handleProfessionalRegistration(e) {
+// Handler para cadastro de profissional (form simples) - AGORA COM VERCELL AUTH
+async function handleProfessionalRegistration(e) {
     e.preventDefault();
     
     const formData = {
@@ -176,8 +196,38 @@ function handleProfessionalRegistration(e) {
         return;
     }
     
-    // Simular cadastro
-    registerUser(formData);
+    // USAR VERCELL AUTH - CADASTRO REAL
+    await registerUser(formData);
+}
+
+// Handler para cadastro profissional COMPLETO - AGORA COM VERCELL AUTH
+async function handleProfessionalFullRegistration(e) {
+    e.preventDefault();
+    
+    const formData = {
+        name: document.getElementById('proName').value,
+        cpf: document.getElementById('proCpf').value,
+        email: document.getElementById('proEmail').value,
+        phone: document.getElementById('proPhone').value,
+        birthDate: document.getElementById('proBirth').value,
+        password: document.getElementById('proPassword').value,
+        service: document.getElementById('proService').value,
+        experience: document.getElementById('proExperience').value,
+        description: document.getElementById('proDescription').value,
+        workAreas: Array.from(document.querySelectorAll('input[name="workAreas"]:checked')).map(cb => cb.value),
+        terms: document.getElementById('terms').checked,
+        type: 'professional'
+    };
+    
+    const errors = validateProfessionalFormData(formData);
+    
+    if (errors.length > 0) {
+        showAlert(errors.join('<br>'), 'error');
+        return;
+    }
+    
+    // USAR VERCELL AUTH - CADASTRO REAL
+    await registerUser(formData);
 }
 
 // Validação de dados de login
@@ -195,7 +245,7 @@ function validateLoginData(data) {
     return errors;
 }
 
-// Validação de dados de cadastro
+// Validação de dados de cadastro básico
 function validateFormData(data) {
     const errors = [];
     
@@ -218,9 +268,58 @@ function validateFormData(data) {
     return errors;
 }
 
+// Validação de dados de cadastro profissional COMPLETO
+function validateProfessionalFormData(data) {
+    const errors = validateFormData(data);
+    
+    // Validações específicas do profissional
+    if (!data.cpf || !isValidCPF(data.cpf)) {
+        errors.push('CPF inválido');
+    }
+    
+    if (!data.birthDate || !isValidBirthDate(data.birthDate)) {
+        errors.push('Data de nascimento inválida (deve ser maior de 18 anos)');
+    }
+    
+    if (!data.service) {
+        errors.push('Selecione o serviço principal');
+    }
+    
+    if (!data.experience || data.experience < 0) {
+        errors.push('Anos de experiência inválidos');
+    }
+    
+    if (!data.description || data.description.length < 10) {
+        errors.push('Descrição deve ter pelo menos 10 caracteres');
+    }
+    
+    if (!data.workAreas || data.workAreas.length === 0) {
+        errors.push('Selecione pelo menos uma área de atuação');
+    }
+    
+    if (!data.terms) {
+        errors.push('Você deve aceitar os termos e condições');
+    }
+    
+    return errors;
+}
+
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+}
+
+function isValidCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    return cpf.length === 11;
+}
+
+function isValidBirthDate(date) {
+    const birthDate = new Date(date);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    
+    return age >= 18 && age <= 100;
 }
 
 // Máscara de telefone
@@ -240,6 +339,23 @@ function initPhoneMasks() {
             e.target.value = value;
         });
     });
+}
+
+// Máscara de CPF
+function initCPFMask() {
+    const cpfInput = document.getElementById('proCpf');
+    
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+            }
+            
+            e.target.value = value;
+        });
+    }
 }
 
 // Menu mobile
@@ -263,55 +379,73 @@ function initMobileMenu() {
     }
 }
 
-// Função de login (simulada)
-function loginUser(userData) {
+// ========== FUNÇÕES PRINCIPAIS ATUALIZADAS ==========
+
+// Função de login - AGORA COM VERCELL AUTH REAL
+async function loginUser(userData) {
     const submitButton = document.querySelector('.login-submit-btn');
     
     // Mostrar loading
     submitButton.classList.add('btn-loading');
     submitButton.disabled = true;
-    
-    // Simular requisição API
-    setTimeout(() => {
+
+    try {
+        // USAR O VERCELL AUTH - LOGIN REAL
+        const result = await window.vercelAuth.loginUser(userData.email, userData.password);
+        
         submitButton.classList.remove('btn-loading');
         submitButton.disabled = false;
-        
-        // Simular resposta da API
-        const success = Math.random() > 0.2; // 80% de chance de sucesso
-        
-        if (success) {
-            showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+
+        if (result.success) {
+            showAlert('Login realizado com sucesso!', 'success');
             
-            // Redirecionar após sucesso
             setTimeout(() => {
                 window.location.href = '../index.html';
-            }, 1500);
+            }, 1000);
         } else {
-            showAlert('E-mail ou senha incorretos. Tente novamente.', 'error');
+            showAlert(result.error, 'error');
         }
-    }, 1500);
+    } catch (error) {
+        submitButton.classList.remove('btn-loading');
+        submitButton.disabled = false;
+        showAlert('Erro inesperado. Tente novamente.', 'error');
+    }
 }
 
-// Função de cadastro (simulada)
-function registerUser(userData) {
+// Função de cadastro - AGORA COM VERCELL AUTH REAL
+async function registerUser(userData) {
     const submitButton = document.querySelector('button[type="submit"]');
     
     // Mostrar loading
     submitButton.classList.add('btn-loading');
     submitButton.disabled = true;
-    
-    // Simular requisição API
-    setTimeout(() => {
+
+    try {
+        // USAR O VERCELL AUTH - CADASTRO REAL
+        const result = await window.vercelAuth.registerUser(userData);
+        
         submitButton.classList.remove('btn-loading');
         submitButton.disabled = false;
-        
-        showAlert('Cadastro realizado com sucesso! Redirecionando...', 'success');
-        
-        // Redirecionar após sucesso
-        setTimeout(() => {
-            window.location.href = '../index.html';
-        }, 2000);
-    }, 1500);
+
+        if (result.success) {
+            // Se for profissional completo, cadastrar dados específicos
+            if (userData.type === 'professional' && userData.experience !== undefined) {
+                await window.vercelAuth.registerProfessional(result.user.id, userData);
+            }
+
+            showAlert('Cadastro realizado com sucesso!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 1500);
+        } else {
+            showAlert(result.error, 'error');
+        }
+    } catch (error) {
+        submitButton.classList.remove('btn-loading');
+        submitButton.disabled = false;
+        showAlert('Erro inesperado. Tente novamente.', 'error');
+    }
 }
 
 // Sistema de alertas
@@ -341,6 +475,24 @@ function showAlert(message, type) {
     }, 5000);
 }
 
+// Verificar se usuário está logado
+function checkAuthStatus() {
+    const currentUser = window.vercelAuth ? window.vercelAuth.getCurrentUser() : null;
+    if (currentUser) {
+        console.log('👤 Usuário logado:', currentUser.email);
+        return currentUser;
+    }
+    return null;
+}
+
+// Logout
+function logoutUser() {
+    if (window.vercelAuth) {
+        window.vercelAuth.logout();
+    }
+    window.location.href = 'auth/login.html';
+}
+
 // Utilidades para outras páginas
 window.AuthUtils = {
     validateEmail: isValidEmail,
@@ -352,5 +504,17 @@ window.AuthUtils = {
         } else {
             return value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
         }
-    }
+    },
+    checkAuthStatus: checkAuthStatus,
+    logoutUser: logoutUser
 };
+
+// Verificar autenticação ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    const user = checkAuthStatus();
+    if (user) {
+        console.log('✅ Usuário autenticado:', user.name);
+        // Aqui você pode atualizar a UI para mostrar que está logado
+        // Ex: mostrar nome do usuário, botão de logout, etc.
+    }
+});

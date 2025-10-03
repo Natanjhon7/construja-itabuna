@@ -2,22 +2,42 @@
   "version": 2,
   "builds": [
     {
-      "src": "**/*.html",
+      "src": "*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "**/*.css",
+      "src": "auth/*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "**/*.js",
+      "src": "css/*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/*.js",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/",
       "dest": "/index.html"
+    },
+    {
+      "src": "/auth/login",
+      "dest": "/auth/login.html"
+    },
+    {
+      "src": "/auth/cadastro",
+      "dest": "/auth/cadastro.html"
+    },
+    {
+      "src": "/auth/cadastro-profissional", 
+      "dest": "/auth/cadastro-profissional.html"
+    },
+    {
+      "src": "/(.*\\.(css|js|json|ico|png|jpg|jpeg|gif|svg))",
+      "dest": "/$1"
     }
   ]
 }
