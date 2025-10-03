@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construjá Itabuna - Encontre os melhores profissionais</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Serviços</a>
+                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Como Funciona</a>
+                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Fale Conosco</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="auth/login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
+                    <a href="auth/cadastro.html" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Cadastre-se</a>
+                </div>
+                
+                <button class="md:hidden focus:outline-none mobile-menu-button">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden mt-4">
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Serviços</a>
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Profissionais</a>
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Como Funciona</a>
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Fale Conosco</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-primary to-blue-400 text-white py-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Encontre os melhores profissionais em Itabuna</h1>
+                    <p class="text-xl mb-8">Conectamos você aos pedreiros, pintores, eletricistas e outros profissionais qualificados da nossa cidade.</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="auth/cadastro.html" class="bg-white text-primary px-6 py-3 rounded-md font-bold text-center hover:bg-gray-100 transition duration-300">Quero contratar</a>
+                        <a href="auth/cadastro-profissional.html" class="bg-secondary text-white px-6 py-3 rounded-md font-bold text-center hover:bg-green-500 transition duration-300">Sou profissional</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="http://static.photos/construction/640x360/1" alt="Profissionais de construção" class="rounded-lg shadow-xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Principais Serviços</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Service Card 1 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+                    <img src="http://static.photos/construction/320x240/2" alt="Pedreiro" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <i data-feather="grid" class="text-primary mr-2"></i>
+                            <h3 class="text-xl font-semibold">Pedreiros</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Construção, reformas e reparos em alvenaria.</p>
+                        <a href="#" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+                
+                <!-- Service Card 2 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+                    <img src="http://static.photos/construction/320x240/3" alt="Pintor" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <i data-feather="droplet" class="text-primary mr-2"></i>
+                            <h3 class="text-xl font-semibold">Pintores</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Pintura residencial, comercial e industrial.</p>
+                        <a href="#" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+                
+                <!-- Service Card 3 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+                    <img src="http://static.photos/technology/320x240/4" alt="Eletricista" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <i data-feather="zap" class="text-primary mr-2"></i>
+                            <h3 class="text-xl font-semibold">Eletricistas</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Instalações e manutenções elétricas.</p>
+                        <a href="#" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+                
+                <!-- Service Card 4 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+                    <img src="http://static.photos/construction/320x240/5" alt="Encanador" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <i data-feather="thermometer" class="text-primary mr-2"></i>
+                            <h3 class="text-xl font-semibold">Encanadores</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Reparos e instalações hidráulicas.</p>
+                        <a href="#" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <a href="#" class="inline-block bg-gray-100 text-gray-800 px-6 py-3 rounded-md font-medium hover:bg-gray-200 transition duration-300">Ver todos os serviços</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Como Funciona</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-primary text-2xl font-bold">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Encontre um profissional</h3>
+                    <p class="text-gray-600">Busque por categoria ou navegue pelos perfis avaliados.</p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-primary text-2xl font-bold">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Entre em contato</h3>
+                    <p class="text-gray-600">Converse diretamente com o profissional via chat.</p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-primary text-2xl font-bold">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Feche o serviço</h3>
+                    <p class="text-gray-600">Combine os detalhes e avalie após a conclusão.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">O que dizem sobre nós</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <img src="http://static.photos/people/200x200/1" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold">Maria Silva</h4>
+                            <div class="flex text-yellow-400">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Encontrei um excelente pedreiro para reformar minha cozinha. O serviço foi impecável e o preço justo!"</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <img src="http://static.photos/people/200x200/2" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold">José Santos</h4>
+                            <div class="flex text-yellow-400">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Como profissional, consegui muitos clientes através da plataforma. Estou muito satisfeito!"</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <img src="http://static.photos/people/200x200/3" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-semibold">Ana Oliveira</h4>
+                            <div class="flex text-yellow-400">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 stroke-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Resolvi meu problema de encanamento rapidamente. O profissional foi muito atencioso e competente."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-primary text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Pronto para encontrar ou oferecer serviços?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Junte-se a nossa comunidade de clientes e profissionais qualificados em Itabuna.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="auth/cadastro.html" class="bg-white text-primary px-6 py-3 rounded-md font-bold text-center hover:bg-gray-100 transition duration-300">Quero contratar</a>
+                <a href="auth/cadastro-profissional.html" class="bg-secondary text-white px-6 py-3 rounded-md font-bold text-center hover:bg-green-500 transition duration-300">Sou profissional</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-feather="tool" class="mr-2"></i> Construjá
+                    </h3>
+                    <p class="text-gray-400">Conectando profissionais e clientes em Itabuna desde 2023.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Links Rápidos</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Serviços</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Profissionais</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Termos de uso</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Para Profissionais</h4>
+                    <ul class="space-y-2">
+                        <li><a href="cadastro-profissional.html" class="text-gray-400 hover:text-white">Cadastre-se</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Cursos disponíveis</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Dicas para perfil</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Contato</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="mail" class="mr-2 w-4 h-4"></i>
+                            <span class="text-gray-400">contato@construja.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="phone" class="mr-2 w-4 h-4"></i>
+                            <span class="text-gray-400">(73) 99999-9999</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="map-pin" class="mr-2 w-4 h-4"></i>
+                            <span class="text-gray-400">Itabuna, BA</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2023 Construjá. Todos os direitos reservados.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i data-feather="facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i data-feather="instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i data-feather="twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
