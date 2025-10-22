@@ -177,8 +177,11 @@ class VercelAuth {
     isLoggedIn() {
         return this.getCurrentUser() !== null;
     }
+
+    
 }
 
 // Inicializar serviço
 window.vercelAuth = new VercelAuth();
 console.log('🔧 Vercel Auth carregado!');
+

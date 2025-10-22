@@ -983,3 +983,4 @@ function validateProfessionalForm(formData) {
     
     return true;
 }
+

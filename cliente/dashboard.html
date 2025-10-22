@@ -157,8 +157,47 @@
 <!-- Incluir em todas as páginas -->
 <script src="js/auth-system.js"></script>
 <script src="js/auth.js"></script> <!-- Mantenha o auth.js também -->
+ <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-<script>
+    const firebaseConfig = {
+     apiKey: "AIzaSyCOkBHFtTdZsu9erHvmimapBHqqDJ5FaZE",
+    authDomain: "construjaita.firebaseapp.com",
+    projectId: "construjaita",
+    storageBucket: "construjaita.firebasestorage.app",
+    messagingSenderId: "535960449157",
+    appId: "1:535960449157:web:f026e7693538e6461af9ec",
+    measurementId: "G-VXWE4PRX78"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "/auth/login.html";
+      } else {
+        // Puxa os dados do Firestore
+        const docRef = doc(db, "usuarios", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const dados = docSnap.data();
+          document.getElementById("nomeUsuario").textContent = dados.nome;
+          document.getElementById("tipoUsuario").textContent = dados.tipo;
+        }
+      }
+    });
+
+    document.getElementById("btnSair").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "/auth/login.html";
+      });
+    });
+  </script>
     feather.replace();
     
     // Inicializar menu mobile

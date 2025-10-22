@@ -108,7 +108,45 @@
     </script>
     <!-- Incluir em todas as páginas -->
 <script src="js/auth-system.js"></script>
-<script src="js/auth.js"></script> <!-- Mantenha o auth.js também -->
+<script src="js/auth.js"></script>
+ <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyCOkBHFtTdZsu9erHvmimapBHqqDJ5FaZE",
+    authDomain: "construjaita.firebaseapp.com",
+    projectId: "construjaita",
+    storageBucket: "construjaita.firebasestorage.app",
+    messagingSenderId: "535960449157",
+    appId: "1:535960449157:web:f026e7693538e6461af9ec",
+    measurementId: "G-VXWE4PRX78"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("btnLogin").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      signInWithEmailAndPassword(auth, email, senha)
+        .then(() => {
+          alert("Login realizado com sucesso!");
+          window.location.href = "/cliente/dashboard.html"; // redireciona para o dashboard
+        })
+        .catch((error) => {
+          alert("Erro: " + error.message);
+        });
+    });
+
+    // Mantém logado se já estiver autenticado
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "/cliente/dashboard.html";
+      }
+    });
+  </script>
 
 <script>
     feather.replace();
