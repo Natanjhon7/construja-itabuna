@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro Profissional - Construjá Itabuna</title>
-    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/auth.css">
     <link rel="stylesheet" href="../css/professional.css">
@@ -38,7 +38,6 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
                     <a href="#" class="text-gray-800 hover:text-primary font-medium">Serviços</a>
-                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Como Funciona</a>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -246,5 +245,24 @@
     <script>
         feather.replace();
     </script>
+    <!-- Incluir sistema de chat -->
+<script src="js/chat-system.js"></script>
+    <!-- Incluir em todas as páginas -->
+<script src="js/auth-system.js"></script>
+<script src="js/auth.js"></script> <!-- Mantenha o auth.js também -->
+
+<script>
+    feather.replace();
+    
+    // Inicializar menu mobile
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+</script>
 </body>
 </html>

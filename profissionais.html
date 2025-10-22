@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos os Profissionais - Construjá</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation (igual ao index.html) -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Serviços</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="auth/login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
+                    <a href="auth/cadastro.html" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Cadastre-se</a>
+                </div>
+                
+                <button class="md:hidden focus:outline-none mobile-menu-button">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Serviço</label>
+                    <select id="serviceFilter" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">Todos os serviços</option>
+                        <option value="pedreiro">Pedreiro</option>
+                        <option value="pintor">Pintor</option>
+                        <option value="eletricista">Eletricista</option>
+                        <option value="encanador">Encanador</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bairro</label>
+                    <select id="areaFilter" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">Todos os bairros</option>
+                        <option value="centro">Centro</option>
+                        <option value="jardim_primavera">Jardim Primavera</option>
+                        <option value="sao_caetano">São Caetano</option>
+                        <option value="fatima">Fátima</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Experiência</label>
+                    <select id="experienceFilter" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">Qualquer</option>
+                        <option value="1">1+ anos</option>
+                        <option value="3">3+ anos</option>
+                        <option value="5">5+ anos</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ordenar por</label>
+                    <select id="sortFilter" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="rating">Melhor avaliação</option>
+                        <option value="experience">Mais experiência</option>
+                        <option value="jobs">Mais jobs</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mt-4 flex justify-between">
+                <button id="clearFilters" class="text-primary hover:underline">
+                    Limpar filtros
+                </button>
+                <span id="resultsCount" class="text-gray-600">0 profissionais encontrados</span>
+            </div>
+        </div>
+        
+        <!-- Grid de Profissionais -->
+        <div id="allProfessionalsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="col-span-full text-center py-12">
+                <i data-feather="users" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-500 mb-2">Carregando profissionais...</h3>
+                <p class="text-gray-400">Buscando os melhores profissionais para você.</p>
+            </div>
+        </div>
+        
+        <!-- Paginação -->
+        <div id="pagination" class="mt-12 flex justify-center">
+            <!-- Paginação será carregada via JavaScript -->
+        </div>
+    </div>
+</section>
+
+    <script src="js/professionals.js"></script>
+    <script src="js/professionals-page.js"></script>
+    <script>
+        feather.replace();
+    </script>
+    <!-- Incluir sistema de chat -->
+<script src="js/chat-system.js"></script>
+    <!-- Incluir em todas as páginas -->
+<script src="js/auth-system.js"></script>
+<script src="js/auth.js"></script> <!-- Mantenha o auth.js também -->
+
+<script>
+    feather.replace();
+    
+    // Inicializar menu mobile
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+</script>
+</body>
+</html>

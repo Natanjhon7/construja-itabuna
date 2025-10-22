@@ -518,3 +518,468 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ex: mostrar nome do usuário, botão de logout, etc.
     }
 });
+
+// Função para cadastro de cliente
+function registerClient(formData) {
+    const submitButton = document.querySelector('#clientRegistrationForm button[type="submit"]');
+    
+    // Validar dados
+    if (!validateClientForm(formData)) {
+        return false;
+    }
+    
+    // Mostrar loading
+    submitButton.classList.add('btn-loading');
+    submitButton.disabled = true;
+    
+    try {
+        // Verificar se email já existe
+        const users = JSON.parse(localStorage.getItem('construja_users') || '[]');
+        const userExists = users.find(user => user.email === formData.email);
+        
+        if (userExists) {
+            throw new Error('E-mail já cadastrado no sistema');
+        }
+        
+        // Criar ID único
+        const userId = 'cli_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Preparar dados do usuário
+        const userData = {
+            id: userId,
+            name: formData.name.trim(),
+            email: formData.email.toLowerCase().trim(),
+            phone: formData.phone.trim(),
+            password: formData.password, // Em produção, usar bcrypt
+            type: 'client',
+            registrationDate: new Date().toISOString(),
+            status: 'active',
+            lastLogin: null,
+            profileCompleted: false
+        };
+        
+        // Salvar usuário
+        users.push(userData);
+        localStorage.setItem('construja_users', JSON.stringify(users));
+        
+        // Salvar dados específicos do cliente
+        const clients = JSON.parse(localStorage.getItem('construja_clients') || '[]');
+        const clientData = {
+            ...userData,
+            address: {
+                street: '',
+                neighborhood: '',
+                city: 'Itabuna',
+                state: 'BA'
+            },
+            jobsRequested: 0,
+            jobsCompleted: 0,
+            favoriteProfessionals: [],
+            recentSearches: [],
+            notifications: true,
+            rating: 0,
+            reviewsGiven: []
+        };
+        
+        clients.push(clientData);
+        localStorage.setItem('construja_clients', JSON.stringify(clients));
+        
+        // Limpar formulário
+        document.getElementById('clientRegistrationForm').reset();
+        
+        submitButton.classList.remove('btn-loading');
+        submitButton.disabled = false;
+        
+        showAlert('Cadastro realizado com sucesso! Redirecionando para login...', 'success');
+        
+        // Redirecionar para login após 2 segundos
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('Erro no cadastro:', error);
+        submitButton.classList.remove('btn-loading');
+        submitButton.disabled = false;
+        showAlert(error.message || 'Erro ao realizar cadastro. Tente novamente.', 'error');
+        return false;
+    }
+}
+
+// Validar formulário de cliente
+function validateClientForm(formData) {
+    // Validar nome
+    if (!formData.name || formData.name.trim().length < 2) {
+        showAlert('Por favor, insira um nome válido (mínimo 2 caracteres)', 'error');
+        return false;
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email || !emailRegex.test(formData.email)) {
+        showAlert('Por favor, insira um e-mail válido', 'error');
+        return false;
+    }
+    
+    // Validar telefone (formato brasileiro)
+    const phoneRegex = /^(\+55\s?)?(\(?\d{2}\)?[\s-]?)?\d{4,5}[\s-]?\d{4}$/;
+    if (!formData.phone || !phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+        showAlert('Por favor, insira um telefone válido', 'error');
+        return false;
+    }
+    
+    // Validar senha
+    if (!formData.password || formData.password.length < 6) {
+        showAlert('A senha deve ter pelo menos 6 caracteres', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+// Função para formatar telefone
+function formatPhoneNumber(phone) {
+    // Remove tudo que não é número
+    const numbers = phone.replace(/\D/g, '');
+    
+    // Formata baseado no tamanho
+    if (numbers.length === 11) {
+        return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else if (numbers.length === 10) {
+        return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    }
+    
+    return phone;
+}
+
+// Função para login de usuário
+function loginUser(email, password) {
+    const submitButton = document.querySelector('.login-submit-btn');
+    
+    // Mostrar loading
+    submitButton.classList.add('btn-loading');
+    submitButton.disabled = true;
+    
+    try {
+        const users = JSON.parse(localStorage.getItem('construja_users') || '[]');
+        const user = users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+            // Verificar status da conta
+            if (user.status === 'pending') {
+                showAlert('Seu cadastro está em análise. Aguarde a aprovação.', 'warning');
+                submitButton.classList.remove('btn-loading');
+                submitButton.disabled = false;
+                return false;
+            }
+            
+            if (user.status === 'rejected') {
+                showAlert('Seu cadastro foi rejeitado. Entre em contato com o suporte.', 'error');
+                submitButton.classList.remove('btn-loading');
+                submitButton.disabled = false;
+                return false;
+            }
+            
+            if (user.status === 'suspended') {
+                showAlert('Sua conta está suspensa. Entre em contato com o suporte.', 'error');
+                submitButton.classList.remove('btn-loading');
+                submitButton.disabled = false;
+                return false;
+            }
+            
+            // Atualizar último login
+            user.lastLogin = new Date().toISOString();
+            localStorage.setItem('construja_users', JSON.stringify(users));
+            
+            // Salvar sessão
+            localStorage.setItem('construja_current_user', JSON.stringify(user));
+            
+            showAlert('Login realizado com sucesso!', 'success');
+            
+            // Redirecionar baseado no tipo de usuário
+            setTimeout(() => {
+    if (user.type === 'professional') {
+        window.location.href = '../profissional/dashboard.html';
+    } else {
+        window.location.href = '../cliente/dashboard.html';
+    }
+}, 1500);
+            
+            return true;
+            
+        } else {
+            throw new Error('E-mail ou senha incorretos');
+        }
+        
+    } catch (error) {
+        console.error('Erro no login:', error);
+        submitButton.classList.remove('btn-loading');
+        submitButton.disabled = false;
+        showAlert(error.message || 'Erro ao fazer login', 'error');
+        return false;
+    }
+}
+
+// Verificar se usuário está logado
+function checkAuth() {
+    const user = JSON.parse(localStorage.getItem('construja_current_user'));
+    return user && user.status === 'active';
+}
+
+// Fazer logout
+function logout() {
+    localStorage.removeItem('construja_current_user');
+    window.location.href = '../index.html';
+}
+
+// Obter dados do usuário atual
+function getCurrentUser() {
+    return JSON.parse(localStorage.getItem('construja_current_user'));
+}
+
+// Obter dados completos do cliente
+function getClientData(userId) {
+    const clients = JSON.parse(localStorage.getItem('construja_clients') || '[]');
+    return clients.find(client => client.id === userId);
+}
+
+// Event Listeners para formulários
+document.addEventListener('DOMContentLoaded', function() {
+    // Cadastro de Cliente
+    const clientForm = document.getElementById('clientRegistrationForm');
+    if (clientForm) {
+        clientForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                password: document.getElementById('password').value
+            };
+            
+            registerClient(formData);
+        });
+        
+        // Formatação automática do telefone
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                const formatted = formatPhoneNumber(e.target.value);
+                if (formatted !== e.target.value) {
+                    e.target.value = formatted;
+                }
+            });
+        }
+    }
+    
+    // Cadastro de Profissional
+    const professionalForm = document.getElementById('professionalRegistrationForm');
+    if (professionalForm) {
+        professionalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('proName').value,
+                email: document.getElementById('proEmail').value,
+                phone: document.getElementById('proPhone').value,
+                service: document.getElementById('proService').value,
+                password: document.getElementById('proPassword').value
+            };
+            
+            registerProfessional(formData);
+        });
+        
+        // Formatação automática do telefone
+        const proPhoneInput = document.getElementById('proPhone');
+        if (proPhoneInput) {
+            proPhoneInput.addEventListener('input', function(e) {
+                const formatted = formatPhoneNumber(e.target.value);
+                if (formatted !== e.target.value) {
+                    e.target.value = formatted;
+                }
+            });
+        }
+    }
+    
+    // Login
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            loginUser(email, password);
+        });
+    }
+    
+    // Sistema de tabs
+    const clientTab = document.getElementById('clientTab');
+    const professionalTab = document.getElementById('professionalTab');
+    const clientFormDiv = document.getElementById('clientForm');
+    const professionalFormDiv = document.getElementById('professionalForm');
+    
+    if (clientTab && professionalTab) {
+        clientTab.addEventListener('click', function() {
+            clientTab.classList.add('active', 'text-primary', 'border-primary');
+            clientTab.classList.remove('text-gray-500', 'border-transparent');
+            professionalTab.classList.remove('active', 'text-primary', 'border-primary');
+            professionalTab.classList.add('text-gray-500', 'border-transparent');
+            clientFormDiv.classList.remove('hidden');
+            clientFormDiv.classList.add('active');
+            professionalFormDiv.classList.add('hidden');
+            professionalFormDiv.classList.remove('active');
+        });
+        
+        professionalTab.addEventListener('click', function() {
+            professionalTab.classList.add('active', 'text-primary', 'border-primary');
+            professionalTab.classList.remove('text-gray-500', 'border-transparent');
+            clientTab.classList.remove('active', 'text-primary', 'border-primary');
+            clientTab.classList.add('text-gray-500', 'border-transparent');
+            professionalFormDiv.classList.remove('hidden');
+            professionalFormDiv.classList.add('active');
+            clientFormDiv.classList.add('hidden');
+            clientFormDiv.classList.remove('active');
+        });
+    }
+    
+    // Menu mobile
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+});
+
+// Função simplificada para cadastro de profissional (versão básica)
+function registerProfessional(formData) {
+    const submitButton = document.querySelector('#professionalRegistrationForm button[type="submit"]');
+    
+    // Validar dados
+    if (!validateProfessionalForm(formData)) {
+        return false;
+    }
+    
+    // Mostrar loading
+    submitButton.classList.add('btn-loading');
+    submitButton.disabled = true;
+    
+    try {
+        // Verificar se email já existe
+        const users = JSON.parse(localStorage.getItem('construja_users') || '[]');
+        const userExists = users.find(user => user.email === formData.email);
+        
+        if (userExists) {
+            throw new Error('E-mail já cadastrado no sistema');
+        }
+        
+        // Criar ID único
+        const userId = 'pro_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Preparar dados do usuário
+        const userData = {
+            id: userId,
+            name: formData.name.trim(),
+            email: formData.email.toLowerCase().trim(),
+            phone: formData.phone.trim(),
+            password: formData.password,
+            type: 'professional',
+            registrationDate: new Date().toISOString(),
+            status: 'pending', // Profissionais precisam de aprovação
+            lastLogin: null,
+            profileCompleted: false
+        };
+        
+        // Salvar usuário
+        users.push(userData);
+        localStorage.setItem('construja_users', JSON.stringify(users));
+        
+        // Salvar dados específicos do profissional
+        const professionals = JSON.parse(localStorage.getItem('construja_professionals') || '[]');
+        const professionalData = {
+            ...userData,
+            service: formData.service,
+            experience: 0,
+            description: '',
+            workAreas: [],
+            rating: 0,
+            completedJobs: 0,
+            reviews: [],
+            documents: {
+                profilePhoto: null,
+                portfolio: [],
+                documents: []
+            },
+            verificationStatus: 'pending'
+        };
+        
+        professionals.push(professionalData);
+        localStorage.setItem('construja_professionals', JSON.stringify(professionals));
+        
+        // Limpar formulário
+        document.getElementById('professionalRegistrationForm').reset();
+        
+        submitButton.classList.remove('btn-loading');
+        submitButton.disabled = false;
+        
+        showAlert('Cadastro profissional realizado! Seu perfil será analisado e em breve você receberá uma resposta.', 'success');
+        
+        // Redirecionar para login após 3 segundos
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 3000);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('Erro no cadastro profissional:', error);
+        submitButton.classList.remove('btn-loading');
+        submitButton.disabled = false;
+        showAlert(error.message || 'Erro ao realizar cadastro. Tente novamente.', 'error');
+        return false;
+    }
+}
+
+// Validar formulário de profissional
+function validateProfessionalForm(formData) {
+    // Validar nome
+    if (!formData.name || formData.name.trim().length < 2) {
+        showAlert('Por favor, insira um nome válido (mínimo 2 caracteres)', 'error');
+        return false;
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email || !emailRegex.test(formData.email)) {
+        showAlert('Por favor, insira um e-mail válido', 'error');
+        return false;
+    }
+    
+    // Validar telefone
+    const phoneRegex = /^(\+55\s?)?(\(?\d{2}\)?[\s-]?)?\d{4,5}[\s-]?\d{4}$/;
+    if (!formData.phone || !phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+        showAlert('Por favor, insira um telefone válido', 'error');
+        return false;
+    }
+    
+    // Validar serviço
+    if (!formData.service) {
+        showAlert('Por favor, selecione um serviço', 'error');
+        return false;
+    }
+    
+    // Validar senha
+    if (!formData.password || formData.password.length < 6) {
+        showAlert('A senha deve ter pelo menos 6 caracteres', 'error');
+        return false;
+    }
+    
+    return true;
+}

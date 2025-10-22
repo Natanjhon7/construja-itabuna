@@ -199,3 +199,83 @@
 .animate-slide-in-up {
     animation: slideInUp 0.5s ease-out;
 }
+
+/* Estados de formulário */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+.btn-loading.btn-secondary::after {
+    border: 2px solid #ffffff;
+    border-right-color: transparent;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Transições suaves para tabs */
+.form-container {
+    transition: opacity 0.3s ease;
+}
+
+.form-container:not(.active) {
+    display: none;
+}
+
+.form-container.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Estados de input */
+input:invalid {
+    border-color: #ef4444;
+}
+
+input:valid {
+    border-color: #10b981;
+}
+
+/* Alertas personalizados */
+.alert-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.alert-error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.alert-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.alert-info {
+    background-color: #3b82f6;
+    color: white;
+}

@@ -37,6 +37,78 @@ body {
     outline-offset: 2px;
 }
 
+/* style.css - Adicione estas regras */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8B5C66;
+}
+
+.portfolio-item {
+    display: block;
+    padding: 10px;
+    background: #8B5C66;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.portfolio-image {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.professional-card {
+    transition: all 0.3s ease;
+}
+
+.professional-card:hover {
+    transform: translateY(-4px);
+}
+
+.filter-btn {
+    transition: all 0.3s ease;
+}
+
+.filter-btn.active {
+    background-color: #3B82F6;
+    color: white;
+}
+
+.custom-alert {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+}
+
+/* Animações */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-in-up {
+    animation: slideInUp 0.6s ease-out;
+}
+
 /* Estilos para estrelas de avaliação */
 .star-rating i {
     display: inline-block;
@@ -65,3 +137,131 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+/* Estados de loading */
+.btn-loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Cards de profissionais */
+.professional-card {
+    transition: all 0.3s ease;
+}
+
+.professional-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Alertas */
+.custom-alert {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Chat Modal Styles */
+#chatModal {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+
+#chatMessages {
+    scrollbar-width: thin;
+    scrollbar-color: #107ef3 #ffffff;
+    border-bottom-color: #107ef3;
+    background-color: #ffffff;
+    
+}
+
+
+#chatMessages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+    background: #797979;
+    border-radius: 3px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Animação de digitação */
+.typing-indicator {
+    display: inline-block;
+    background: #e5e7eb;
+    padding: 8px 12px;
+    border-radius: 18px;
+}
+
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    background: #9ca3af;
+    display: inline-block;
+    border-radius: 50%;
+    margin: 0 1px;
+    animation: typing 1.5s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Profissional | Construjá</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="../profissionais.html" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                    <!-- Botão de Solicitações será adicionado automaticamente -->
+                </div>
+                
+                <div class="flex items-center space-x-4" id="userMenu">
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 text-gray-800 hover:text-primary">
+                            <i data-feather="user" class="w-5 h-5"></i>
+                            <span id="userName">Profissional</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+                            <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Olá, <span id="welcomeName">Profissional</span>!</h1>
+            <p class="text-gray-600">Gerencie seus serviços e conversas com clientes</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                        <i data-feather="message-circle" class="text-primary w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Solicitações</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="solicitacoesCount">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-full mr-4">
+                        <i data-feather="check-circle" class="text-secondary w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Serviços Concluídos</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="jobsCompleted">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                        <i data-feather="star" class="text-yellow-500 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Avaliação Média</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="averageRating">0.0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 p-3 rounded-full mr-4">
+                        <i data-feather="dollar-sign" class="text-purple-500 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Receita Total</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="totalRevenue">R$ 0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solicitações Recentes -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Solicitações Recentes</h3>
+                <button onclick="chatSystem.mostrarSolicitacoes()" class="text-primary hover:underline text-sm">
+                    Ver todas
+                </button>
+            </div>
+            <div id="recentSolicitations" class="space-y-4">
+                <!-- Solicitações serão carregadas aqui -->
+            </div>
+        </div>
+
+        <!-- Meu Perfil Público -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Meu Perfil Público</h3>
+                <a href="perfil.html" class="text-primary hover:underline text-sm">Editar Perfil</a>
+            </div>
+            <div id="profilePreview">
+                <!-- Preview do perfil -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth-system.js"></script>
+    <script src="../js/chat-system.js"></script>
+    <script src="../js/profissional-dashboard.js"></script>
+    <script>
+        feather.replace();
+        
+        // Verificação de autenticação
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = JSON.parse(localStorage.getItem('construja_current_user'));
+            
+            if (!user || user.type !== 'professional') {
+                window.location.href = '../auth/login.html';
+                return;
+            }
+            
+            // Inicializar dashboard do profissional
+            profissionalDashboard = new ProfissionalDashboard();
+        });
+    </script>
+</body>
+</html>

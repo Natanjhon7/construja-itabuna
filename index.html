@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Construjá Itabuna - Encontre os melhores profissionais</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/feather-icons"></script>
@@ -24,42 +24,61 @@
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="container mx-auto px-4 py-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-4">
-                    <a href="#" class="flex items-center">
-                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
-                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
-                    </a>
-                </div>
-                
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Serviços</a>
-                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
-                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Como Funciona</a>
-                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Fale Conosco</a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="/auth/login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
-                    <a href="/auth/cadastro.html" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Cadastre-se</a>
-                </div>
-                
-                <button class="md:hidden focus:outline-none mobile-menu-button">
-                    <i data-feather="menu"></i>
-                </button>
+<nav class="bg-white shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="flex items-center">
+                    <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                    <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                </a>
             </div>
             
-            <!-- Mobile Menu -->
-            <div class="mobile-menu hidden md:hidden mt-4">
-                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Serviços</a>
-                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Profissionais</a>
-                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Como Funciona</a>
-                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Fale Conosco</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                <a href="profissionais.html" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                <!-- Dashboard link será adicionado automaticamente pelo auth-system.js -->
+            </div>
+            
+            <div class="flex items-center space-x-4" id="userMenu" style="display: none;">
+                <div class="relative group">
+                    <button class="flex items-center space-x-2 text-gray-800 hover:text-primary">
+                        <i data-feather="user" class="w-5 h-5"></i>
+                        <span id="userName">Usuário</span>
+                        <i data-feather="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+                        <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4" id="guestMenu">
+                <a href="auth/login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
+                <a href="auth/cadastro.html" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Cadastre-se</a>
+            </div>
+            
+            <button class="md:hidden focus:outline-none mobile-menu-button">
+                <i data-feather="menu"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu hidden md:hidden mt-4">
+            <a href="index.html" class="block py-2 text-gray-800 hover:text-primary">Home</a>
+            <a href="profissionais.html" class="block py-2 text-gray-800 hover:text-primary">Profissionais</a>
+            <a href="#" class="block py-2 text-gray-800 hover:text-primary">Como Funciona</a>
+            <div class="border-t mt-2 pt-2" id="mobileUserMenu" style="display: none;">
+                <a href="#" id="mobileDashboardLink" class="block py-2 text-gray-800 hover:text-primary">Meu Painel</a>
+                <a href="#" onclick="logout()" class="block py-2 text-gray-800 hover:text-primary">Sair</a>
+            </div>
+            <div id="mobileGuestMenu">
+                <a href="auth/login.html" class="block py-2 text-gray-800 hover:text-primary">Entrar</a>
+                <a href="auth/cadastro.html" class="block py-2 text-gray-800 hover:text-primary">Cadastre-se</a>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-primary to-blue-400 text-white py-20">
@@ -139,9 +158,6 @@
                 </div>
             </div>
             
-            <div class="text-center mt-10">
-                <a href="#" class="inline-block bg-gray-100 text-gray-800 px-6 py-3 rounded-md font-medium hover:bg-gray-200 transition duration-300">Ver todos os serviços</a>
-            </div>
         </div>
     </section>
 
@@ -177,6 +193,50 @@
                     <h3 class="text-xl font-semibold mb-3">Feche o serviço</h3>
                     <p class="text-gray-600">Combine os detalhes e avalie após a conclusão.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+        <!-- Professionals Section -->
+    <section class="py-16 bg-white" id="professionals-section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Profissionais em Destaque</h2>
+            
+            <!-- Filtros -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button class="filter-btn active bg-primary text-white px-4 py-2 rounded-md" data-filter="all">
+                    Todos
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="pedreiro">
+                    Pedreiros
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="pintor">
+                    Pintores
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="eletricista">
+                    Eletricistas
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="encanador">
+                    Encanadores
+                </button>
+            </div>
+            
+            <!-- Grid de Profissionais -->
+            <div id="professionalsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Os profissionais serão carregados aqui via JavaScript -->
+                <div class="col-span-full text-center py-12">
+                    <i data-feather="users" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-500 mb-2">Carregando profissionais...</h3>
+                    <p class="text-gray-400">Buscando os melhores profissionais para você.</p>
+                </div>
+            </div>
+            
+            <!-- Ver mais -->
+            <div class="text-center mt-8">
+                <a href="profissionais.html" class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-blue-600 transition duration-300 inline-flex items-center">
+                    Ver todos os profissionais
+                    <i data-feather="arrow-right" class="ml-2 w-4 h-4"></i>
+                </a>
             </div>
         </div>
     </section>
@@ -264,27 +324,17 @@
                     <h3 class="text-xl font-bold mb-4 flex items-center">
                         <i data-feather="tool" class="mr-2"></i> Construjá
                     </h3>
-                    <p class="text-gray-400">Conectando profissionais e clientes em Itabuna desde 2023.</p>
+                    <p class="text-gray-400">Conectando profissionais e clientes em Itabuna desde 2025.</p>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold mb-4">Links Rápidos</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">Home</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Serviços</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Profissionais</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Termos de uso</a></li>
-                    </ul>
+            
+                </div>
+
+                <div>
+                    
                 </div>
                 
-                <div>
-                    <h4 class="font-bold mb-4">Para Profissionais</h4>
-                    <ul class="space-y-2">
-                        <li><a href="cadastro-profissional.html" class="text-gray-400 hover:text-white">Cadastre-se</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Cursos disponíveis</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Dicas para perfil</a></li>
-                    </ul>
-                </div>
                 
                 <div>
                     <h4 class="font-bold mb-4">Contato</h4>
@@ -301,27 +351,69 @@
                             <i data-feather="map-pin" class="mr-2 w-4 h-4"></i>
                             <span class="text-gray-400">Itabuna, BA</span>
                         </li>
+                    <a href="https://www.instagram.com/construja.ba" target="_blank" class="text-gray-400 hover:text-white flex items-center gap-2">
+                        <i data-feather="instagram"></i>
+                        <span>Instagram</span>
+                    </a>
                     </ul>
                 </div>
             </div>
             
             <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 mb-4 md:mb-0">© 2023 Construjá. Todos os direitos reservados.</p>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <i data-feather="facebook"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <i data-feather="instagram"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <i data-feather="twitter"></i>
-                    </a>
-                </div>
+                <p class="text-gray-400 mb-4 md:mb-0">© 2025 Construjá. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
 
     <script src="js/script.js"></script>
+    <!-- Incluir sistema de chat -->
+     <script src="js/auth-system.js"></script>
+<script src="js/auth.js"></script> <!-- Mantenha o auth.js também -->
+<script src="js/chat-system.js"></script>
+<script src="js/professionals.js"></script>
+    <!-- Incluir em todas as páginas -->
+
+
+<script>
+    feather.replace();
+    
+    // Inicializar menu mobile
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+</script>
+<!-- No index.html, adicione temporariamente -->
+<div class="fixed bottom-4 right-4 z-40">
+    <button onclick="testarChatSystem()" class="bg-red-500 text-white px-4 py-2 rounded-lg">
+        Testar Chat
+    </button>
+</div>
+
+<script>
+function testarChatSystem() {
+    console.log('=== TESTE MANUAL ===');
+    
+    // Verificar se o chatSystem existe
+    if (typeof chatSystem === 'undefined') {
+        console.error('chatSystem não está definido!');
+        return;
+    }
+    
+    // Pegar o primeiro profissional da lista
+    const professionals = JSON.parse(localStorage.getItem('construja_professionals') || '[]');
+    if (professionals.length > 0) {
+        const firstPro = professionals[0];
+        console.log('Testando com profissional:', firstPro.name);
+        chatSystem.iniciarContato(firstPro.id);
+    } else {
+        console.log('Nenhum profissional cadastrado');
+    }
+}
+</script>
 </body>
 </html>
