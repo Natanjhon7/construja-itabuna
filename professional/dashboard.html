@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Profissional | Construjá</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="../profissionais.html" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                </div>
+                
+                <div class="flex items-center space-x-4" id="userMenu">
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 text-gray-800 hover:text-primary">
+                            <i data-feather="user" class="w-5 h-5"></i>
+                            <span id="userName">Profissional</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+                            <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Perfil</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Olá, <span id="welcomeName">Profissional</span>!</h1>
+            <p class="text-gray-600">Gerencie seus serviços e conversas com clientes</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                        <i data-feather="message-circle" class="text-primary w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Solicitações</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="solicitacoesCount">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-full mr-4">
+                        <i data-feather="check-circle" class="text-secondary w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Serviços Concluídos</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="jobsCompleted">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                        <i data-feather="star" class="text-yellow-500 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Avaliação Média</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="averageRating">0.0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 p-3 rounded-full mr-4">
+                        <i data-feather="dollar-sign" class="text-purple-500 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Receita Total</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="totalRevenue">R$ 0</h3>
+                    </div>
+                    <div>
+                        <a href="carteira.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+    <i data-feather="dollar-sign" class="w-4 h-4 inline mr-2"></i>
+    Minha Carteira
+</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <!-- Solicitações Recentes -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Solicitações Recentes</h3>
+                <button onclick="verTodasSolicitacoes()" class="text-primary hover:underline text-sm">
+                    Ver todas
+                </button>
+            </div>
+            <div id="recentSolicitations" class="space-y-4">
+                <div class="text-center py-8">
+                    <i data-feather="inbox" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                    <p class="text-gray-500">Nenhuma solicitação recente</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Adicione esta seção no dashboard do profissional -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h3 class="text-lg font-semibold mb-4 text-gray-800">Conversas com Clientes</h3>
+    <div id="professionalConversationsList">
+        <!-- Conversas serão carregadas aqui -->
+    </div>
+</div>
+
+        <!-- Meu Perfil Público -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Meu Perfil Público</h3>
+                <a href="perfil.html" class="text-primary hover:underline text-sm">Editar Perfil</a>
+            </div>
+            <div id="profilePreview">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-gray-200 rounded-full w-16 h-16 flex items-center justify-center">
+                        <i data-feather="user" class="text-gray-500"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800" id="profileName">Seu Nome</h4>
+                        <p class="text-gray-600" id="profileService">Especialidade</p>
+                        <p class="text-sm text-gray-500" id="profileRating">Avaliação: 0.0 ★</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- 🔥 SUBSTITUA POR ESTE CÓDIGO SUPABASE -->
+    <script type="module">
+        // Configuração do Supabase - USE SUAS CREDENCIAIS
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Verificar autenticação e carregar dados
+        async function initializeDashboard() {
+            try {
+                // Verificar se usuário está logado
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    console.log('Usuário não logado, redirecionando...');
+                    window.location.href = '../auth/login.html';
+                    return;
+                }
+
+                // Buscar dados do usuário
+                const { data: usuario, error: userError } = await supabase
+                    .from('usuarios')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (userError) throw userError;
+
+                // Verificar se é profissional
+                if (usuario.tipo !== 'profissional') {
+                    console.log('Usuário não é profissional, redirecionando...');
+                    window.location.href = '../cliente/dashboard.html';
+                    return;
+                }
+
+                console.log('Profissional autenticado:', usuario.nome);
+                
+                // Atualizar UI com dados do usuário
+                document.getElementById('userName').textContent = usuario.nome;
+                document.getElementById('welcomeName').textContent = usuario.nome;
+                document.getElementById('profileName').textContent = usuario.nome;
+
+                // Buscar dados específicos do profissional
+                const { data: profissional, error: profError } = await supabase
+                    .from('profissionais')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profError && profError.code !== 'PGRST116') { // Se erro não for "tabela não existe"
+                    throw profError;
+                }
+
+                if (profissional) {
+                    document.getElementById('profileService').textContent = profissional.especialidade || 'Especialidade';
+                    document.getElementById('averageRating').textContent = profissional.avaliacao || '0.0';
+                    document.getElementById('profileRating').textContent = `Avaliação: ${profissional.avaliacao || '0.0'} ★`;
+                }
+
+                // Carregar estatísticas
+                await loadProfessionalStats(user.id);
+
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+                alert('Erro ao carregar dados. Tente novamente.');
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Carregar estatísticas do profissional
+        async function loadProfessionalStats(userId) {
+            try {
+                // Buscar serviços do profissional (se a tabela existir)
+                const { data: servicos, error } = await supabase
+                    .from('servicos')
+                    .select('*')
+                    .eq('profissional_id', userId);
+
+                if (error && error.code !== 'PGRST116') { // PGRST116 = tabela não existe
+                    throw error;
+                }
+
+                // Calcular estatísticas
+                if (servicos) {
+                    const totalServicos = servicos.length;
+                    const servicosConcluidos = servicos.filter(s => s.status === 'concluido').length;
+                    const servicosSolicitados = servicos.filter(s => s.status === 'solicitado').length;
+                    
+                    // Calcular receita total (soma dos orçamentos dos serviços concluídos)
+                    const receitaTotal = servicos
+                        .filter(s => s.status === 'concluido' && s.orcamento)
+                        .reduce((total, servico) => total + parseFloat(servico.orcamento || 0), 0);
+
+                    // Atualizar estatísticas na UI
+                    document.getElementById('solicitacoesCount').textContent = servicosSolicitados;
+                    document.getElementById('jobsCompleted').textContent = servicosConcluidos;
+                    document.getElementById('totalRevenue').textContent = `R$ ${receitaTotal.toFixed(2)}`;
+                }
+
+                // Carregar solicitações recentes
+                await loadRecentSolicitations(userId);
+
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+                // Não mostrar erro para o usuário
+            }
+        }
+
+        // Carregar solicitações recentes
+        async function loadRecentSolicitations(profissionalId) {
+            try {
+                const { data: solicitacoes, error } = await supabase
+                    .from('servicos')
+                    .select(`
+                        *,
+                        cliente:usuarios!servicos_cliente_id_fkey(nome, telefone)
+                    `)
+                    .eq('profissional_id', profissionalId)
+                    .eq('status', 'solicitado')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
+
+                const container = document.getElementById('recentSolicitations');
+                
+                if (!solicitacoes || solicitacoes.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <i data-feather="inbox" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                            <p class="text-gray-500">Nenhuma solicitação recente</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = solicitacoes.map(servico => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-blue-100 p-2 rounded-full">
+                                <i data-feather="user" class="text-blue-600 w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">${servico.cliente?.nome || 'Cliente'}</h4>
+                                <p class="text-sm text-gray-600">${servico.titulo || 'Serviço solicitado'}</p>
+                                <p class="text-xs text-gray-500">${new Date(servico.created_at).toLocaleDateString('pt-BR')}</p>
+                            </div>
+                        </div>
+                        <button onclick="aceitarSolicitacao('${servico.id}')" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 text-sm">
+                            Aceitar
+                        </button>
+                    </div>
+                `).join('');
+
+                feather.replace();
+
+            } catch (error) {
+                console.error('Erro ao carregar solicitações:', error);
+            }
+        }
+
+        // Função para aceitar solicitação
+        async function aceitarSolicitacao(servicoId) {
+            try {
+                const { error } = await supabase
+                    .from('servicos')
+                    .update({ status: 'andamento' })
+                    .eq('id', servicoId);
+
+                if (error) throw error;
+
+                alert('Solicitação aceita com sucesso!');
+                // Recarregar as solicitações
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    await loadRecentSolicitations(user.id);
+                    await loadProfessionalStats(user.id);
+                }
+            } catch (error) {
+                console.error('Erro ao aceitar solicitação:', error);
+                alert('Erro ao aceitar solicitação.');
+            }
+        }
+
+        // Ver todas as solicitações
+        function verTodasSolicitacoes() {
+            alert('Funcionalidade em desenvolvimento!');
+            // Aqui você pode redirecionar para uma página de todas as solicitações
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                await supabase.auth.signOut();
+                window.location.href = '../auth/login.html';
+            } catch (error) {
+                console.error('Erro no logout:', error);
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Inicializar dashboard quando página carregar
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>

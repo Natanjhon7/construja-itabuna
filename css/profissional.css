@@ -1,0 +1,355 @@
+/* Estilos específicos para página de profissionais */
+
+/* Container principal */
+.professionals-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header da página */
+.professionals-header {
+    background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.professionals-header h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.professionals-header p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* Barra de busca */
+.search-section {
+    background-color: white;
+    padding: 25px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.search-container {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-box {
+    flex: 1;
+    position: relative;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.search-box i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #757575;
+}
+
+.filter-toggle {
+    background-color: #F5F5F5;
+    border: 1px solid #ddd;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Layout principal */
+.main-content {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* Filtros */
+.filters-sidebar {
+    width: 280px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    height: fit-content;
+}
+
+.filter-group {
+    margin-bottom: 25px;
+}
+
+.filter-group h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #212121;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filter-group h3 span {
+    font-size: 12px;
+    color: #2E7D32;
+    cursor: pointer;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-option input {
+    width: 18px;
+    height: 18px;
+    accent-color: #4CAF50;
+}
+
+.filter-option label {
+    font-size: 14px;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.star {
+    color: #FFC107;
+}
+
+.availability-slider {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.availability-slider input {
+    flex: 1;
+}
+
+/* Seção de resultados */
+.results-section {
+    flex: 1;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.results-count {
+    font-size: 16px;
+    color: #757575;
+}
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-options select {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+/* Grid de profissionais */
+.professionals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.professional-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.professional-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.professional-info h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.professional-info p {
+    font-size: 14px;
+    color: #757575;
+    margin-bottom: 5px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rating-value {
+    font-weight: bold;
+    color: #212121;
+}
+
+.card-body {
+    padding: 15px 20px;
+}
+
+.specialties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.specialty {
+    background-color: #F5F5F5;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.description {
+    font-size: 14px;
+    color: #757575;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.card-footer {
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-weight: bold;
+    color: #2E7D32;
+}
+
+.btn-contact {
+    background-color: #FF9800;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-contact:hover {
+    background-color: #F57C00;
+}
+
+/* Sem resultados */
+.no-results {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.no-results i {
+    font-size: 48px;
+    color: #ddd;
+    margin-bottom: 15px;
+}
+
+.no-results h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #212121;
+}
+
+.no-results p {
+    color: #757575;
+    margin-bottom: 20px;
+}
+
+.btn-clear-filters {
+    background-color: #F5F5F5;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-clear-filters:hover {
+    background-color: #e9ecef;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .filters-sidebar {
+        width: 100%;
+    }
+    
+    .search-container {
+        flex-direction: column;
+    }
+    
+    .professionals-grid {
+        grid-template-columns: 1fr;
+    }
+}

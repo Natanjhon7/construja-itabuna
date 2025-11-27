@@ -1,0 +1,456 @@
+        <!-- Available Services Modal -->
+        <div id="availableServicesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden">
+                <div class="bg-primary text-white p-4 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">Serviços Disponíveis</h3>
+                    <button onclick="closeAvailableServices()" class="text-white hover:text-blue-200">
+                        <i data-feather="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div id="availableServicesList" class="p-4 overflow-y-auto max-h-96">
+                    <!-- Available services will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Configuração do Supabase
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let services = [];
+
+        // Inicializar página
+        async function initializePage() {
+            await checkAuth();
+            await loadServices();
+            await loadStats();
+            setupEventListeners();
+        }
+
+        // Verificar autenticação
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: usuario } = await supabase
+                    .from('usuarios')
+                    .select('nome, tipo')
+                    .eq('id', user.id)
+                    .single();
+                
+                currentUser = usuario;
+
+                if (usuario.tipo !== 'profissional') {
+                    window.location.href = '../cliente/dashboard.html';
+                }
+            } else {
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Carregar serviços do profissional
+        async function loadServices(filterStatus = 'all') {
+            let query = supabase
+                .from('servicos')
+                .select(`
+                    *,
+                    cliente:usuarios!servicos_cliente_id_fkey(nome, telefone, email)
+                `)
+                .eq('profissional_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (filterStatus !== 'all') {
+                query = query.eq('status', filterStatus);
+            }
+
+            const { data: servicos, error } = await query;
+
+            if (error) {
+                console.error('Erro ao carregar serviços:', error);
+                return;
+            }
+
+            services = servicos || [];
+            renderServices();
+        }
+
+        // Carregar estatísticas
+        async function loadStats() {
+            const { data: servicos, error } = await supabase
+                .from('servicos')
+                .select('status, orcamento')
+                .eq('profissional_id', currentUser.id);
+
+            if (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+                return;
+            }
+
+            const solicitacoes = servicos.filter(s => s.status === 'solicitado').length;
+            const andamento = servicos.filter(s => s.status === 'em_andamento').length;
+            const concluidos = servicos.filter(s => s.status === 'concluido').length;
+            
+            const receitaTotal = servicos
+                .filter(s => s.status === 'concluido' && s.orcamento)
+                .reduce((total, servico) => total + parseFloat(servico.orcamento || 0), 0);
+
+            document.getElementById('solicitacoesCount').textContent = solicitacoes;
+            document.getElementById('andamentoCount').textContent = andamento;
+            document.getElementById('concluidosCount').textContent = concluidos;
+            document.getElementById('receitaTotal').textContent = `R$ ${receitaTotal.toFixed(2)}`;
+        }
+
+        // Renderizar serviços
+        function renderServices() {
+            const container = document.getElementById('servicesList');
+            
+            if (services.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-white rounded-lg shadow-md">
+                        <i data-feather="briefcase" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Nenhum serviço encontrado</h3>
+                        <p class="text-gray-500">Você ainda não tem serviços atribuídos.</p>
+                    </div>
+                `;
+                feather.replace();
+                return;
+            }
+
+            container.innerHTML = services.map(servico => `
+                <div class="bg-white rounded-lg shadow-md p-6 service-card" data-status="${servico.status}">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">${servico.titulo}</h3>
+                                    <p class="text-gray-600">${servico.tipo_servico}</p>
+                                </div>
+                                <span class="status-badge ${getStatusBadgeClass(servico.status)}">
+                                    ${getStatusText(servico.status)}
+                                </span>
+                            </div>
+                            
+                            <p class="text-gray-700 mb-4">${servico.descricao}</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
+                                <div>
+                                    <strong>Cliente:</strong>
+                                    <p>${servico.cliente.nome}</p>
+                                </div>
+                                <div>
+                                    <strong>Local:</strong>
+                                    <p class="truncate">${servico.endereco_servico}</p>
+                                </div>
+                                <div>
+                                    <strong>Data:</strong>
+                                    <p>${new Date(servico.data_solicitacao).toLocaleDateString('pt-BR')}</p>
+                                </div>
+                                ${servico.orcamento ? `
+                                    <div>
+                                        <strong>Orçamento:</strong>
+                                        <p class="text-green-600 font-semibold">R$ ${parseFloat(servico.orcamento).toFixed(2)}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="mt-4 lg:mt-0 lg:ml-6 flex flex-col space-y-2">
+                            ${servico.status === 'solicitado' ? `
+                                <button onclick="sendQuote('${servico.id}')" 
+                                        class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm">
+                                    Enviar Orçamento
+                                </button>
+                                <button onclick="declineService('${servico.id}')" 
+                                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 text-sm">
+                                    Recusar
+                                </button>
+                            ` : ''}
+                            
+                            ${servico.status === 'em_andamento' ? `
+                                <button onclick="markAsCompleted('${servico.id}')" 
+                                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 text-sm">
+                                    Marcar como Concluído
+                                </button>
+                            ` : ''}
+
+                            <button onclick="contactClient('${servico.cliente.telefone}', '${servico.cliente.email}')" 
+                                    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300 text-sm">
+                                Contatar Cliente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            feather.replace();
+        }
+
+        // Carregar serviços disponíveis (sem profissional atribuído)
+        async function loadAvailableServices() {
+            const { data: availableServices, error } = await supabase
+                .from('servicos')
+                .select(`
+                    *,
+                    cliente:usuarios!servicos_cliente_id_fkey(nome, telefone, email)
+                `)
+                .is('profissional_id', null)
+                .eq('status', 'solicitado')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erro ao carregar serviços disponíveis:', error);
+                alert('Erro ao carregar serviços disponíveis.');
+                return;
+            }
+
+            const modal = document.getElementById('availableServicesModal');
+            const list = document.getElementById('availableServicesList');
+
+            if (availableServices.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-8">
+                        <i data-feather="inbox" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                        <p class="text-gray-500">Nenhum serviço disponível no momento.</p>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = availableServices.map(service => `
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-semibold text-gray-800">${service.titulo}</h4>
+                                <p class="text-gray-600">${service.tipo_servico}</p>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                                Disponível
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-700 text-sm mb-3">${service.descricao}</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
+                            <div>
+                                <strong>Cliente:</strong> ${service.cliente.nome}
+                            </div>
+                            <div>
+                                <strong>Local:</strong> ${service.endereco_servico}
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-2">
+                            <button onclick="acceptService('${service.id}')" 
+                                    class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm">
+                                Aceitar Serviço
+                            </button>
+                            <button onclick="viewServiceDetails('${service.id}')" 
+                                    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300 text-sm">
+                                Ver Detalhes
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.remove('hidden');
+            feather.replace();
+        }
+
+        // Fechar modal de serviços disponíveis
+        function closeAvailableServices() {
+            document.getElementById('availableServicesModal').classList.add('hidden');
+        }
+
+        // Aceitar serviço disponível
+        async function acceptService(serviceId) {
+            const { error } = await supabase
+                .from('servicos')
+                .update({ 
+                    profissional_id: currentUser.id,
+                    status: 'em_andamento',
+                    data_inicio: new Date().toISOString()
+                })
+                .eq('id', serviceId);
+
+            if (error) {
+                alert('Erro ao aceitar serviço.');
+                return;
+            }
+
+            alert('Serviço aceito com sucesso!');
+            closeAvailableServices();
+            loadServices();
+            loadStats();
+        }
+
+        // Enviar orçamento
+        async function sendQuote(serviceId) {
+            const valor = prompt('Qual o valor do orçamento? (R$)');
+            const prazo = prompt('Qual o prazo em dias?');
+            const descricao = prompt('Alguma observação no orçamento?');
+
+            if (!valor || !prazo) {
+                alert('Valor e prazo são obrigatórios.');
+                return;
+            }
+
+            try {
+                // Criar orçamento
+                const { error: quoteError } = await supabase
+                    .from('orcamentos')
+                    .insert([{
+                        servico_id: serviceId,
+                        profissional_id: currentUser.id,
+                        valor: parseFloat(valor),
+                        prazo_dias: parseInt(prazo),
+                        descricao: descricao
+                    }]);
+
+                if (quoteError) throw quoteError;
+
+                // Atualizar status do serviço
+                const { error: serviceError } = await supabase
+                    .from('servicos')
+                    .update({ 
+                        status: 'orcamento_enviado',
+                        orcamento: parseFloat(valor)
+                    })
+                    .eq('id', serviceId);
+
+                if (serviceError) throw serviceError;
+
+                alert('Orçamento enviado com sucesso!');
+                loadServices();
+                loadStats();
+
+            } catch (error) {
+                console.error('Erro ao enviar orçamento:', error);
+                alert('Erro ao enviar orçamento.');
+            }
+        }
+
+        // Recusar serviço
+        async function declineService(serviceId) {
+            if (!confirm('Tem certeza que deseja recusar este serviço?')) return;
+
+            const { error } = await supabase
+                .from('servicos')
+                .update({ 
+                    profissional_id: null,
+                    status: 'solicitado'
+                })
+                .eq('id', serviceId);
+
+            if (error) {
+                alert('Erro ao recusar serviço.');
+                return;
+            }
+
+            alert('Serviço recusado.');
+            loadServices();
+            loadStats();
+        }
+
+        // Marcar como concluído
+        async function markAsCompleted(serviceId) {
+            const { error } = await supabase
+                .from('servicos')
+                .update({ 
+                    status: 'concluido',
+                    data_conclusao: new Date().toISOString()
+                })
+                .eq('id', serviceId);
+
+            if (error) {
+                alert('Erro ao marcar serviço como concluído.');
+                return;
+            }
+
+            alert('Serviço marcado como concluído!');
+            loadServices();
+            loadStats();
+        }
+
+        // Contatar cliente
+        function contactClient(telefone, email) {
+            let message = `Contatos do cliente:\n`;
+            if (telefone) message += `📞 Telefone: ${telefone}\n`;
+            if (email) message += `📧 Email: ${email}\n`;
+            
+            alert(message);
+        }
+
+        // Utilitários de status
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'solicitado': 'bg-yellow-100 text-yellow-800',
+                'orcamento_enviado': 'bg-blue-100 text-blue-800',
+                'orcamento_aceito': 'bg-purple-100 text-purple-800',
+                'em_andamento': 'bg-green-100 text-green-800',
+                'concluido': 'bg-gray-100 text-gray-800',
+                'cancelado': 'bg-red-100 text-red-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'solicitado': 'Solicitado',
+                'orcamento_enviado': 'Orçamento Enviado',
+                'orcamento_aceito': 'Orçamento Aceito',
+                'em_andamento': 'Em Andamento',
+                'concluido': 'Concluído',
+                'cancelado': 'Cancelado'
+            };
+            return texts[status] || status;
+        }
+
+        // Filtrar serviços
+        function setupEventListeners() {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Atualizar tabs ativas
+                    document.querySelectorAll('.filter-tab').forEach(t => {
+                        t.classList.remove('active', 'bg-primary', 'text-white');
+                        t.classList.add('text-gray-600', 'hover:bg-gray-100');
+                    });
+                    
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                    
+                    // Carregar serviços com filtro
+                    const status = this.dataset.status;
+                    loadServices(status);
+                });
+            });
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = '../auth/login.html';
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <style>
+        .filter-tab.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</body>
+</html>

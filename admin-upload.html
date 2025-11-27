@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Upload para 10 Profissionais</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .professional-section { margin-bottom: 30px; padding: 20px; border: 2px solid #8B5C66; border-radius: 8px; }
+        .professional-header { background: #8B5C66; color: white; padding: 15px; margin: -20px -20px 20px -20px; border-radius: 6px 6px 0 0; }
+        .file-input { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+        .preview-img { width: 80px; height: 80px; object-fit: cover; margin: 5px; border-radius: 5px; border: 2px solid #8B5C66; }
+        .save-btn { background: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .upload-all-btn { background: #8B5C66; color: white; padding: 15px; border: none; border-radius: 5px; cursor: pointer; width: 100%; margin: 20px 0; font-size: 16px; }
+        .code-preview { margin-top: 30px; padding: 20px; background: #2d2d2d; color: #f8f8f2; border-radius: 8px; }
+        .portfolio-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .tab-container { margin-bottom: 20px; }
+        .tab-buttons { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 15px; background: #e0e0e0; border: none; border-radius: 5px; cursor: pointer; }
+        .tab-btn.active { background: #8B5C66; color: white; }
+        .professional-tab { display: none; }
+        .professional-tab.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 Upload para os 10 Profissionais</h1>
+        
+        <!-- Navegação por Abas -->
+        <div class="tab-container">
+            <div class="tab-buttons" id="tabButtons">
+                <!-- Os botões serão gerados via JavaScript -->
+            </div>
+            
+            <!-- Conteúdo das Abas -->
+            <div id="tabContent">
+                <!-- O conteúdo será gerado via JavaScript -->
+            </div>
+        </div>
+
+        <button onclick="generateAllCode()" class="upload-all-btn">🔄 GERAR CÓDIGO COMPLETO COM BASE64</button>
+        
+        <!-- Código Completo Atualizado -->
+        <div class="code-preview">
+            <h3>📋 CÓDIGO COMPLETO DOS 10 PROFISSIONAIS:</h3>
+            <button onclick="copyAllCode()" style="padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 10px;">
+                📋 Copiar Código Completo
+            </button>
+            <pre id="allProfessionalsCode"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos 10 profissionais (mantendo suas informações originais)
+        const professionalsData = [
+            {
+                id: 'pro_fixo_1',
+                personal: { 
+                    name: 'Marcelo Coelho Damasceno', 
+                    email: 'marcelodam@construja.com', 
+                    phone: '(73) 98814-5196' 
+                },
+                professional: { 
+                    service: 'Manutenção e instalação eletrica', 
+                    experience: '20', 
+                    description: 'Especialista em Manutenção e instalação eletrica.',
+                    workAreas: ['centro', 'sao_pedro', 'jardim_primavera', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.8, 
+                completedJobs: 25, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_2', 
+                personal: { 
+                    name: 'André Batista Viana', 
+                    email: 'andreviana82745@construja.com', 
+                    phone: '(73) 98889-7624' 
+                },
+                professional: { 
+                    service: 'Ajudante Prático, Auxiliar de Escritório, Ferramenteiro', 
+                    experience: '15', 
+                    description: 'Atua em diversas áreas no setor da construção por ser ajudante prático, além de possuir experiência na parte de logística, sendo auxiliar de escritório e ferramenteiro.',
+                    workAreas: ['jardim_primavera', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.7, 
+                completedJobs: 18, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_3',
+                personal: { 
+                    name: 'Antonio Caetano Dos Santos Filho', 
+                    email: 'Antoniofilho21@construja.com', 
+                    phone: '(73) 9156-6007' 
+                },
+                professional: { 
+                    service: 'Bitoneiro', 
+                    experience: '10', 
+                    description: 'Profissional qualificado e experiente para o serviço.',
+                    workAreas: ['centro', 'jardim_vitoria'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.6, 
+                completedJobs: 15, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_4',
+                personal: { 
+                    name: 'Luciano Santos Ferreira', 
+                    email: 'donosdabolalu@gmail.com', 
+                    phone: '(73) 99851-0877' 
+                },
+                professional: { 
+                    service: 'Pedreiro', 
+                    experience: '15', 
+                    description: 'Contribuir com bons resultados, por meio das mihas experiencias adquiridas ao longo dos anos atuando como pedreiro.',
+                    workAreas: ['centro', 'sao_caetano', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.9, 
+                completedJobs: 32, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_5',
+                personal: { 
+                    name: 'Gustavo Conceição Santos', 
+                    email: 'gustavoconc@construja.com', 
+                    phone: '(73) 98810-1754' 
+                },
+                professional: { 
+                    service: 'Auxiliar de carga', 
+                    experience: '0.8', 
+                    description: 'Otimo profissional, preparado para contribuir e promover o melhor.',
+                    workAreas: ['centro', 'sao_caetano', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.9, 
+                completedJobs: 32, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_6',
+                personal: { 
+                    name: 'Adailton Ferreira De Araujo', 
+                    email: 'ferreiraaraujo@construja.com', 
+                    phone: '(71) 99113-2474' 
+                },
+                professional: { 
+                    service: 'Encarregado', 
+                    experience: '25', 
+                    description: 'Profissional dedicado e empenhado com vasta experiência.',
+                    workAreas: ['centro', 'sao_caetano', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.9, 
+                completedJobs: 32, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_7',
+                personal: { 
+                    name: 'Jaime Bernardo Góes De Jesus', 
+                    email: 'jesusjaimee02@gamil.com', 
+                    phone: '(71) 99719-9029' 
+                },
+                professional: { 
+                    service: 'Encarregado', 
+                    experience: '19', 
+                    description: '19 anos de profissão executando a função de encarregado de obra.',
+                    workAreas: ['centro', 'sao_caetano', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.9, 
+                    completedJobs: 32, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_8',
+                personal: { 
+                    name: 'Daniel Alves Oliveira', 
+                    email: 'daniel10alves@construja.com', 
+                    phone: '(73) 99830-8371' 
+                },
+                professional: { 
+                    service: 'Ajudante de predeiro Pratico', 
+                    experience: '6', 
+                    description: 'Serviços gerais, servente pratico, ajudante de pedreiro pratico, empacotador e estoquista.',
+                    workAreas: ['centro', 'sao_caetano', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.9, 
+                completedJobs: 32, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_9',
+                personal: { 
+                    name: 'Alan Santana Dos Santos', 
+                    email: 'dossantos321@construja.com', 
+                    phone: '(73) 99131-0043' 
+                },
+                professional: { 
+                    service: 'Servente', 
+                    experience: '8', 
+                    description: 'Otimo profissional com experiência nas areas de servente comum, servente de pedreiro e auxiliar de produção.',
+                    workAreas: ['centro', 'sao_caetano', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.9, 
+                completedJobs: 32, 
+                status: 'approved',
+                isFixed: true
+            },
+            {
+                id: 'pro_fixo_10',
+                personal: { 
+                    name: 'Emerson Alves Leandro', 
+                    email: 'emersonkaka_@hotmail.com', 
+                    phone: '(73) 98802-3336' 
+                },
+                professional: { 
+                    service: 'Ajudante de predeiro', 
+                    experience: '15', 
+                    description: 'Experiente, proativo, dedicado com experiências em ajudante de pedreiro, servente de pedreiro, auxiliar de almoxerifado, auxiliar de produção.',
+                    workAreas: ['centro', 'sao_caetano', 'fatima', 'outros'] 
+                },
+                documents: { 
+                    profilePhoto: '',
+                    portfolio: []
+                },
+                rating: 4.9, 
+                completedJobs: 32, 
+                status: 'approved',
+                isFixed: true
+            }
+        ];
+
+        // Inicializar a interface
+        function initializeTabs() {
+            const tabButtons = document.getElementById('tabButtons');
+            const tabContent = document.getElementById('tabContent');
+            
+            professionalsData.forEach((pro, index) => {
+                // Criar botão da aba
+                const tabBtn = document.createElement('button');
+                tabBtn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+                tabBtn.textContent = `${index + 1}. ${pro.personal.name}`;
+                tabBtn.onclick = () => switchTab(index);
+                tabButtons.appendChild(tabBtn);
+                
+                // Criar conteúdo da aba
+                const tab = document.createElement('div');
+                tab.className = `professional-tab ${index === 0 ? 'active' : ''}`;
+                tab.id = `tab-${index}`;
+                tab.innerHTML = `
+                    <div class="professional-section">
+                        <div class="professional-header">
+                            <h3>${pro.personal.name} - ${pro.professional.service}</h3>
+                            <p>${pro.personal.email} | ${pro.personal.phone}</p>
+                        </div>
+                        
+                        <div>
+                            <h4>📷 Foto de Perfil</h4>
+                            <input type="file" id="profilePhoto-${index}" accept="image/*" class="file-input">
+                            <div id="profilePreview-${index}" class="preview"></div>
+                        </div>
+
+                        <div>
+                            <h4>📄 Currículo (PDF)</h4>
+                            <input type="file" id="curriculum-${index}" accept=".pdf" class="file-input">
+                            <div id="pdfPreview-${index}" class="preview"></div>
+                        </div>
+
+                        <div>
+                            <h4>🖼️ Fotos do Portfólio (Múltiplas)</h4>
+                            <input type="file" id="portfolioPhotos-${index}" accept="image/*" multiple class="file-input">
+                            <div id="portfolioPreview-${index}" class="portfolio-grid"></div>
+                        </div>
+
+                        <button onclick="saveProfessional(${index})" class="save-btn">💾 Salvar para ${pro.personal.name.split(' ')[0]}</button>
+                    </div>
+                `;
+                tabContent.appendChild(tab);
+                
+                // Adicionar event listeners
+                setupEventListeners(index);
+            });
+        }
+
+        // Configurar event listeners para cada profissional
+        function setupEventListeners(index) {
+            // Foto de perfil
+            document.getElementById(`profilePhoto-${index}`).addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) convertToBase64(file, function(base64) {
+                    professionalsData[index].documents.profilePhoto = base64;
+                    document.getElementById(`profilePreview-${index}`).innerHTML = `
+                        <img src="${base64}" class="preview-img" alt="Preview">
+                        <p>✅ ${file.name}</p>
+                    `;
+                });
+            });
+
+            // Currículo PDF
+            document.getElementById(`curriculum-${index}`).addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) convertToBase64(file, function(base64) {
+                    // Adicionar ao início do portfólio
+                    if (!professionalsData[index].documents.portfolio.some(item => item.includes('application/pdf'))) {
+                        professionalsData[index].documents.portfolio.unshift(base64);
+                    }
+                    document.getElementById(`pdfPreview-${index}`).innerHTML = `
+                        <div style="padding: 10px; background: #8B5C66; color: white; border-radius: 5px; display: inline-block;">
+                            📄 ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)
+                        </div>
+                    `;
+                });
+            });
+
+            // Fotos do portfólio
+            document.getElementById(`portfolioPhotos-${index}`).addEventListener('change', function(e) {
+                const files = e.target.files;
+                document.getElementById(`portfolioPreview-${index}`).innerHTML = '';
+                
+                Array.from(files).forEach(file => {
+                    convertToBase64(file, function(base64) {
+                        // Adicionar apenas se for imagem (não PDF)
+                        if (file.type.includes('image')) {
+                            professionalsData[index].documents.portfolio.push(base64);
+                            document.getElementById(`portfolioPreview-${index}`).innerHTML += `
+                                <img src="${base64}" class="preview-img" alt="Portfolio">
+                            `;
+                        }
+                    });
+                });
+            });
+        }
+
+        // Trocar de aba
+        function switchTab(index) {
+            // Remover active de todas as abas
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.professional-tab').forEach(tab => tab.classList.remove('active'));
+            
+            // Adicionar active na aba selecionada
+            document.querySelectorAll('.tab-btn')[index].classList.add('active');
+            document.getElementById(`tab-${index}`).classList.add('active');
+        }
+
+        // Converter para Base64
+        function convertToBase64(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                callback(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Salvar profissional individual
+        function saveProfessional(index) {
+            alert('✅ Dados salvos para ' + professionalsData[index].personal.name);
+        }
+
+        // Gerar código completo
+        function generateAllCode() {
+            const code = `const PROFISSIONAIS_FIXOS = ${JSON.stringify(professionalsData, null, 4)};`;
+            document.getElementById('allProfessionalsCode').textContent = code;
+            alert('✅ Código gerado! Clique em "Copiar Código Completo"');
+        }
+
+        // Copiar código
+        function copyAllCode() {
+            const code = document.getElementById('allProfessionalsCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Código dos 10 profissionais copiado! Cole no seu arquivo JavaScript.');
+            });
+        }
+
+        // Inicializar
+        initializeTabs();
+        generateAllCode(); // Gerar código inicial
+    </script>
+    <!-- Inclua o arquivo dos profissionais fixos -->
+<script src="js/profissionais-fixos.js"></script>
+
+<script>
+// Função para carregar profissionais fixos
+function carregarProfissionaisFixos() {
+    const gridProfissionais = document.getElementById('professionals-grid');
+    
+    if (!gridProfissionais) {
+        console.error('Elemento professionals-grid não encontrado');
+        return;
+    }
+
+    // Limpar grid antes de adicionar
+    gridProfissionais.innerHTML = '';
+
+    PROFISSIONAIS_FIXOS.forEach(profissional => {
+        const card = criarCardProfissional(profissional);
+        gridProfissionais.appendChild(card);
+    });
+}
+
+// Função para criar o card do profissional
+function criarCardProfissional(pro) {
+    const card = document.createElement('div');
+    card.className = 'professional-card';
+    card.innerHTML = `
+        <div class="card-header">
+            <div class="avatar">
+                ${pro.personal.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+            </div>
+            <div class="professional-info">
+                <h3>${pro.personal.name}</h3>
+                <p>${pro.professional.service}</p>
+                <div class="rating">
+                    <span class="rating-value">${pro.rating}</span>
+                    <div class="rating-stars">
+                        ${'★'.repeat(Math.floor(pro.rating))}${'☆'.repeat(5-Math.floor(pro.rating))}
+                    </div>
+                    <span>(${pro.completedJobs} jobs)</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="specialties">
+                <span class="specialty">${pro.professional.experience} anos exp.</span>
+                ${pro.professional.workAreas.map(area => 
+                    `<span class="specialty">${formatarArea(area)}</span>`
+                ).join('')}
+            </div>
+            <p class="description">${pro.professional.description}</p>
+        </div>
+        <div class="card-footer">
+            <span class="price">A combinar</span>
+            <button class="btn-contact" onclick="contatarProfissional('${pro.personal.name}', '${pro.personal.phone}')">
+                Contatar
+            </button>
+        </div>
+    `;
+    return card;
+}
+
+// Função para formatar nome da área
+function formatarArea(area) {
+    const areas = {
+        'centro': 'Centro',
+        'jardim_primavera': 'Jardim Primavera',
+        'sao_caetano': 'São Caetano',
+        'fatima': 'Fátima',
+        'jardim_vitoria': 'Jardim Vitória',
+        'sao_pedro': 'São Pedro',
+        'outros': 'Outras áreas'
+    };
+    return areas[area] || area;
+}
+
+// Função para contatar profissional
+function contatarProfissional(nome, telefone) {
+    alert(`Contatar ${nome}\nTelefone: ${telefone}\n\nEm uma implementação real, isso abriria um chat ou ligação.`);
+}
+
+// Carregar profissionais quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    carregarProfissionaisFixos();
+});
+</script>
+
+</body>
+</html>

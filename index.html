@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construjá Itabuna - Encontre os melhores profissionais</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<!-- Inclua o script -->
+<script src="js/carregar-profissionais.js"></script>
+
+<script>
+// Carregar profissionais quando a página abrir
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Carregando profissionais...');
+    
+    const profissionais = await carregarProfissionais();
+    console.log('Profissionais carregados:', profissionais);
+    
+    exibirProfissionais(profissionais);
+});
+</script>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="profissionais.html" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                </div>
+                
+                <div class="flex items-center space-x-4" id="userMenu" style="display: none;">
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 text-gray-800 hover:text-primary">
+                            <i data-feather="user" class="w-5 h-5"></i>
+                            <span id="userName">Usuário</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+                            <a href="#" id="dashboardLink" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meu Painel</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4" id="guestMenu">
+                    <a href="auth/login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
+                    <a href="auth/cadastro.html" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Cadastre-se</a>
+                </div>
+                
+                <button class="md:hidden focus:outline-none mobile-menu-button">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden mt-4">
+                <a href="index.html" class="block py-2 text-gray-800 hover:text-primary">Home</a>
+                <a href="profissionais.html" class="block py-2 text-gray-800 hover:text-primary">Profissionais</a>
+                <div class="border-t mt-2 pt-2" id="mobileUserMenu" style="display: none;">
+                    <a href="#" id="mobileDashboardLink" class="block py-2 text-gray-800 hover:text-primary">Meu Painel</a>
+                    <a href="#" onclick="logout()" class="block py-2 text-gray-800 hover:text-primary">Sair</a>
+                </div>
+                <div id="mobileGuestMenu">
+                    <a href="auth/login.html" class="block py-2 text-gray-800 hover:text-primary">Entrar</a>
+                    <a href="auth/cadastro.html" class="block py-2 text-gray-800 hover:text-primary">Cadastre-se</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-primary to-blue-400 text-white py-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Construjá Itabuna - Plataforma Completa</h1>
+                    <p class="text-xl mb-8">Encontre profissionais, converse em tempo real, solicite serviços e pague com segurança. Tudo em um só lugar!</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="auth/cadastro.html" class="bg-white text-primary px-6 py-3 rounded-md font-bold text-center hover:bg-gray-100 transition duration-300">
+                            <i data-feather="user-plus" class="w-4 h-4 inline mr-2"></i>
+                            Quero contratar
+                        </a>
+                        <a href="auth/cadastro-profissional.html" class="bg-secondary text-white px-6 py-3 rounded-md font-bold text-center hover:bg-green-500 transition duration-300">
+                            <i data-feather="briefcase" class="w-4 h-4 inline mr-2"></i>
+                            Sou profissional
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="bg-white bg-opacity-20 rounded-lg p-8 max-w-md">
+                        <div class="text-center">
+                            <i data-feather="zap" class="w-16 h-16 mx-auto mb-4 text-yellow-300"></i>
+                            <h3 class="text-2xl font-bold mb-4">Funcionalidades</h3>
+                            <ul class="text-left space-y-3 text-lg">
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="w-5 h-5 mr-3 text-green-300"></i>
+                                    Chat em tempo real
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="w-5 h-5 mr-3 text-green-300"></i>
+                                    Sistema de pagamentos
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="w-5 h-5 mr-3 text-green-300"></i>
+                                    Carteira digital
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="w-5 h-5 mr-3 text-green-300"></i>
+                                    Avaliações e reviews
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plataforma Completa Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Plataforma Completa</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Do cadastro ao pagamento, tudo em um só lugar</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="user-plus" class="text-primary w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2">1. Cadastre-se</h3>
+                    <p class="text-gray-600 text-sm">Cliente ou profissional em 2 minutos</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="message-circle" class="text-secondary w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2">2. Converse</h3>
+                    <p class="text-gray-600 text-sm">Chat em tempo real</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="clipboard" class="text-yellow-500 w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2">3. Feche o Serviço</h3>
+                    <p class="text-gray-600 text-sm">Solicitação com orçamento</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="credit-card" class="text-purple-500 w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2">4. Pague com Segurança</h3>
+                    <p class="text-gray-600 text-sm">Sistema integrado de pagamentos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4 text-center">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-3xl font-bold text-primary mb-2">100+</h3>
+                    <p class="text-gray-600">Usuários Cadastrados</p>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-secondary mb-2">50+</h3>
+                    <p class="text-gray-600">Profissionais</p>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-yellow-500 mb-2">200+</h3>
+                    <p class="text-gray-600">Serviços Realizados</p>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-purple-500 mb-2">R$ 50K+</h3>
+                    <p class="text-gray-600">Em Transações</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Principais Serviços</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Service Card 1 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i data-feather="grid" class="text-primary w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">Pedreiros</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Construção, reformas e reparos em alvenaria.</p>
+                        <a href="profissionais.html?service=pedreiro" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+                
+                <!-- Service Card 2 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 p-3 rounded-full mr-4">
+                                <i data-feather="droplet" class="text-secondary w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">Pintores</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Pintura residencial, comercial e industrial.</p>
+                        <a href="profissionais.html?service=pintor" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+                
+                <!-- Service Card 3 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                                <i data-feather="zap" class="text-yellow-500 w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">Eletricistas</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Instalações e manutenções elétricas.</p>
+                        <a href="profissionais.html?service=eletricista" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+                
+                <!-- Service Card 4 -->
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i data-feather="thermometer" class="text-purple-500 w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">Encanadores</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Reparos e instalações hidráulicas.</p>
+                        <a href="profissionais.html?service=encanador" class="text-primary font-medium hover:underline">Ver profissionais</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Professionals Section -->
+    <section class="py-16 bg-gray-50" id="professionals-section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Profissionais em Destaque</h2>
+            
+            <!-- Filtros -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button class="filter-btn active bg-primary text-white px-4 py-2 rounded-md" data-filter="all">
+                    Todos
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="pedreiro">
+                    Pedreiros
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="pintor">
+                    Pintores
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="eletricista">
+                    Eletricistas
+                </button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300" data-filter="encanador">
+                    Encanadores
+                </button>
+            </div>
+            
+            <!-- Grid de Profissionais -->
+            <div id="professionalsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Profissionais serão carregados via JavaScript -->
+                <div class="col-span-full text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <h3 class="text-lg font-medium text-gray-500 mb-2">Carregando profissionais...</h3>
+                    <p class="text-gray-400">Buscando os melhores profissionais para você.</p>
+                </div>
+            </div>
+            
+            <!-- Ver mais -->
+            <div class="text-center mt-8">
+                <a href="profissionais.html" class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-blue-600 transition duration-300 inline-flex items-center">
+                    Ver todos os profissionais
+                    <i data-feather="arrow-right" class="ml-2 w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">O que dizem sobre nós</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 p-3 rounded-full mr-4">
+                            <i data-feather="user" class="text-blue-600 w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Maria Silva</h4>
+                            <div class="flex text-yellow-400">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Encontrei um excelente pedreiro para reformar minha cozinha. O serviço foi impecável e o preço justo!"</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-100 p-3 rounded-full mr-4">
+                            <i data-feather="user" class="text-green-600 w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">José Santos</h4>
+                            <div class="flex text-yellow-400">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Como profissional, consegui muitos clientes através da plataforma. Estou muito satisfeito!"</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full mr-4">
+                            <i data-feather="user" class="text-purple-600 w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Ana Oliveira</h4>
+                            <div class="flex text-yellow-400">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 stroke-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Resolvi meu problema de encanamento rapidamente. O profissional foi muito atencioso e competente."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-primary text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Pronto para encontrar ou oferecer serviços?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Junte-se a nossa comunidade de clientes e profissionais qualificados em Itabuna.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="auth/cadastro.html" class="bg-white text-primary px-6 py-3 rounded-md font-bold text-center hover:bg-gray-100 transition duration-300">
+                    <i data-feather="user-plus" class="w-4 h-4 inline mr-2"></i>
+                    Quero contratar
+                </a>
+                <a href="auth/cadastro-profissional.html" class="bg-secondary text-white px-6 py-3 rounded-md font-bold text-center hover:bg-green-500 transition duration-300">
+                    <i data-feather="briefcase" class="w-4 h-4 inline mr-2"></i>
+                    Sou profissional
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-feather="tool" class="mr-2"></i> Construjá
+                    </h3>
+                    <p class="text-gray-400">Conectando profissionais e clientes em Itabuna desde 2025.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Links Rápidos</h4>
+                    <ul class="space-y-2">
+                        <li><a href="profissionais.html" class="text-gray-400 hover:text-white">Buscar Profissionais</a></li>
+                        <li><a href="auth/cadastro.html" class="text-gray-400 hover:text-white">Cadastrar como Cliente</a></li>
+                        <li><a href="auth/cadastro-profissional.html" class="text-gray-400 hover:text-white">Cadastrar como Profissional</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Funcionalidades</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-400">Chat em tempo real</li>
+                        <li class="text-gray-400">Sistema de pagamentos</li>
+                        <li class="text-gray-400">Carteira digital</li>
+                        <li class="text-gray-400">Avaliações</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Contato</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="mail" class="mr-2 w-4 h-4"></i>
+                            <span class="text-gray-400">contato@construja.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="phone" class="mr-2 w-4 h-4"></i>
+                            <span class="text-gray-400">(73) 99999-9999</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="map-pin" class="mr-2 w-4 h-4"></i>
+                            <span class="text-gray-400">Itabuna, BA</span>
+                        </li>
+                        <li>
+                            <a href="https://www.instagram.com/construja.ba" target="_blank" class="text-gray-400 hover:text-white flex items-center gap-2">
+                                <i data-feather="instagram"></i>
+                                <span>Instagram</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2025 Construjá. Todos os direitos reservados.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white">Termos de Uso</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Política de Privacidade</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Widget -->
+    <div id="chatWidget" class="fixed bottom-4 right-4 z-40">
+        <button onclick="toggleChatList()" class="bg-primary text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300">
+            <i data-feather="message-circle" class="w-6 h-6"></i>
+        </button>
+
+        <!-- Lista de Conversas -->
+        <div id="chatList" class="hidden absolute bottom-16 right-0 w-80 bg-white rounded-lg shadow-xl max-h-96 overflow-hidden">
+            <div class="bg-primary text-white p-4">
+                <h3 class="font-semibold">Conversas</h3>
+            </div>
+            <div id="conversationsList" class="overflow-y-auto max-h-80">
+                <div class="p-4 text-center text-gray-500">
+                    <i data-feather="message-circle" class="w-8 h-8 mx-auto mb-2"></i>
+                    <p>Nenhuma conversa</p>
+                </div>
+            </div>
+            <div class="p-3 border-t border-gray-200">
+                <p class="text-sm text-gray-500 text-center">Encontre profissionais para conversar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuração básica do Supabase
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Menu mobile
+        feather.replace();
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Sistema de autenticação simplificado
+        async function checkAuth() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: usuario } = await supabase
+                        .from('usuarios')
+                        .select('nome, tipo')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (usuario) {
+                        // Usuário logado
+                        document.getElementById('userMenu').style.display = 'flex';
+                        document.getElementById('guestMenu').style.display = 'none';
+                        document.getElementById('mobileUserMenu').style.display = 'block';
+                        document.getElementById('mobileGuestMenu').style.display = 'none';
+                        
+                        document.getElementById('userName').textContent = usuario.nome;
+                        document.getElementById('dashboardLink').href = usuario.tipo === 'profissional' ? 'professional/index.html' : 'cliente/dashboard.html';
+                        document.getElementById('mobileDashboardLink').href = usuario.tipo === 'profissional' ? 'professional/index.html' : 'cliente/dashboard.html';
+                    }
+                }
+            } catch (error) {
+                console.log('Usuário não logado');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.reload();
+        }
+
+        // Chat functions
+        function toggleChatList() {
+            document.getElementById('chatList').classList.toggle('hidden');
+        }
+
+        // Carregar profissionais - VERSÃO CORRIGIDA
+async function loadProfessionals() {
+    try {
+        // ✅ BUSCAR DA TABELA usuarios EM VEZ DE profissionais
+        const { data: professionals, error } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('tipo', 'profissional')
+            .limit(8);
+
+        if (error) throw error;
+
+        const container = document.getElementById('professionalsGrid');
+        
+        if (!professionals || professionals.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <i data-feather="users" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-500 mb-2">Nenhum profissional encontrado</h3>
+                    <p class="text-gray-400">Seja o primeiro a se cadastrar como profissional!</p>
+                    <a href="auth/cadastro-profissional.html" class="inline-block mt-4 bg-primary text-white px-6 py-2 rounded-md hover:bg-blue-600">
+                        Cadastrar como Profissional
+                    </a>
+                </div>
+            `;
+            feather.replace();
+            return;
+        }
+
+        console.log('Profissionais encontrados:', professionals);
+
+        container.innerHTML = professionals.map(prof => `
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                <div class="p-6">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-lg">
+                            ${prof.nome ? prof.nome.split(' ').map(n => n[0]).join('').toUpperCase() : 'PR'}
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-lg text-gray-800">${prof.nome || 'Profissional'}</h3>
+                            <p class="text-primary font-medium">${prof.servico_principal || 'Serviços Gerais'}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="flex text-yellow-400">
+                                ${generateStarRating(4.5)} <!-- Avaliação fixa por enquanto -->
+                            </div>
+                            <span class="ml-2 text-sm text-gray-600">4.5</span>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            Disponível
+                        </span>
+                    </div>
+
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        ${prof.descricao || 'Profissional qualificado e experiente.'}
+                    </p>
+
+                    <div class="text-sm text-gray-500 mb-3">
+                        <span class="font-medium">${prof.experiencia || '0'} anos de experiência</span>
+                    </div>
+
+                    <div class="flex space-x-2">
+                        <button onclick="viewProfile('${prof.id}')" 
+                                class="flex-1 bg-gray-100 text-gray-800 py-2 px-4 rounded hover:bg-gray-200 transition duration-300 text-sm">
+                            Ver Perfil
+                        </button>
+                        <button onclick="startChat('${prof.id}', '${prof.nome}')" 
+                                class="flex-1 bg-primary text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 text-sm">
+                            Contatar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        feather.replace();
+
+    } catch (error) {
+        console.error('Erro ao carregar profissionais:', error);
+        document.getElementById('professionalsGrid').innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <i data-feather="alert-triangle" class="w-16 h-16 text-red-300 mx-auto mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-500 mb-2">Erro ao carregar profissionais</h3>
+                <p class="text-gray-400">${error.message}</p>
+                <button onclick="loadProfessionals()" class="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                    Tentar Novamente
+                </button>
+            </div>
+        `;
+        feather.replace();
+    }
+}
+
+        // Gerar estrelas de avaliação
+        function generateStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+            let stars = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i data-feather="star" class="w-4 h-4 fill-current"></i>';
+            }
+            
+            if (hasHalfStar) {
+                stars += '<i data-feather="star" class="w-4 h-4 fill-current"></i>';
+            }
+            
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i data-feather="star" class="w-4 h-4"></i>';
+            }
+
+            return stars;
+        }
+
+        // Funções auxiliares
+        function viewProfile(professionalId) {
+            alert(`Visualizando perfil do profissional ${professionalId}`);
+        }
+
+        function startChat(professionalId, professionalName) {
+            alert(`Iniciando conversa com ${professionalName}`);
+        }
+
+        // Filtros de profissionais
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-primary', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                this.classList.add('active', 'bg-primary', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+                
+                // Aqui você implementaria o filtro real
+                loadProfessionals();
+            });
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadProfessionals();
+            feather.replace();
+        });
+
+        // Google Analytics
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-K02G2D8KE3');
+    </script>
+    
+</body>
+</html>

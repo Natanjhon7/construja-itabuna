@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Profissional - Construjá Itabuna</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/professional.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Serviços</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
+                    <a href="cadastro.html" class="text-primary font-medium">Sou cliente</a>
+                </div>
+                
+                <button class="md:hidden focus:outline-none mobile-menu-button">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden mt-4">
+                <a href="../index.html" class="block py-2 text-gray-800 hover:text-primary">Home</a>
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Serviços</a>
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Como Funciona</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Professional Registration Form -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-secondary text-white py-4 px-6">
+                    <h2 class="text-2xl font-bold">Cadastro Profissional</h2>
+                    <p class="text-green-100">Complete seu perfil para começar a receber serviços</p>
+                </div>
+                
+                <div class="p-6">
+                    <form id="professionalRegistrationForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Informações Pessoais</h3>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proName">Nome completo*</label>
+                                <input type="text" id="proName" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proCpf">CPF*</label>
+                                <input type="text" id="proCpf" name="cpf" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proEmail">E-mail*</label>
+                                <input type="email" id="proEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proPhone">Telefone*</label>
+                                <input type="tel" id="proPhone" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proBirth">Data de Nascimento*</label>
+                                <input type="date" id="proBirth" name="birthDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proPassword">Senha*</label>
+                                <input type="password" id="proPassword" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Informações Profissionais</h3>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proService">Serviço principal*</label>
+                                <select id="proService" name="service" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="pedreiro">Pedreiro</option>
+                                    <option value="pintor">Pintor</option>
+                                    <option value="eletricista">Eletricista</option>
+                                    <option value="encanador">Encanador</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2" for="proExperience">Anos de experiência*</label>
+                                <input type="number" id="proExperience" name="experience" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" min="0" max="50" required>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2" for="proDescription">Descrição do seu trabalho*</label>
+                                <textarea id="proDescription" name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required></textarea>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2">Área de atuação em Itabuna*</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="workAreas">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="workAreas" value="centro" class="rounded text-primary focus:ring-primary">
+                                        <span class="ml-2">Centro</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="workAreas" value="jardim_primavera" class="rounded text-primary focus:ring-primary">
+                                        <span class="ml-2">Jardim Primavera</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="workAreas" value="sao_caetano" class="rounded text-primary focus:ring-primary">
+                                        <span class="ml-2">São Caetano</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="workAreas" value="fatima" class="rounded text-primary focus:ring-primary">
+                                        <span class="ml-2">Fátima</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="workAreas" value="jardim_vitoria" class="rounded text-primary focus:ring-primary">
+                                        <span class="ml-2">Jardim Vitória</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="workAreas" value="sao_pedro" class="rounded text-primary focus:ring-primary">
+                                        <span class="ml-2">São Pedro</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="workAreas" value="outros" class="rounded text-primary focus:ring-primary">
+                                        <span class="ml-2">Outros</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Documentos e Portfólio</h3>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2">Foto de perfil*</label>
+                                <label for="profilePhoto" class="upload-label">
+                                    <div class="upload-area" id="profilePhotoArea">
+                                        <i data-feather="upload" class="mx-auto text-gray-400 mb-2"></i>
+                                        <p class="text-sm text-gray-600">Clique para enviar foto</p>
+                                        <p class="text-xs text-gray-500">Recomendado: 400x400px</p>
+                                    </div>
+                                </label>
+                                <input type="file" id="profilePhoto" name="profilePhoto" class="file-upload" accept="image/*" required>
+                                <div id="profilePhotoPreview" class="mt-2 hidden">
+                                    <img src="" alt="Preview" class="w-20 h-20 object-cover rounded-md">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 mb-2">Documentos (RG, CPF, Certificados)</label>
+                                <label for="documents" class="upload-label">
+                                    <div class="upload-area" id="documentsArea">
+                                        <i data-feather="file-text" class="mx-auto text-gray-400 mb-2"></i>
+                                        <p class="text-sm text-gray-600">Envie seus documentos</p>
+                                        <p class="text-xs text-gray-500">PDF, JPG ou PNG</p>
+                                    </div>
+                                </label>
+                                <input type="file" id="documents" name="documents" class="file-upload" multiple>
+                                <div id="documentsList" class="mt-2 hidden">
+                                    <p class="text-sm text-gray-600">Documentos selecionados:</p>
+                                    <ul id="documentsPreview" class="text-xs text-gray-500"></ul>
+                                </div>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2">Fotos do seu trabalho (opcional)</label>
+                                <label for="portfolio" class="upload-label">
+                                    <div class="upload-area" id="portfolioArea">
+                                        <i data-feather="image" class="mx-auto text-gray-400 mb-2"></i>
+                                        <p class="text-sm text-gray-600">Adicione fotos do seu trabalho</p>
+                                        <p class="text-xs text-gray-500">Até 10 imagens</p>
+                                    </div>
+                                </label>
+                                <input type="file" id="portfolio" name="portfolio" class="file-upload" multiple accept="image/*">
+                                <div id="portfolioPreview" class="mt-2 grid grid-cols-4 gap-2 hidden"></div>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        <input id="terms" name="terms" type="checkbox" class="rounded text-primary focus:ring-primary" required>
+                                    </div>
+                                    <label for="terms" class="ml-3 block text-sm text-gray-700">
+                                        Eu li e concordo com os <a href="#" class="text-primary hover:underline">Termos de Uso</a> e <a href="#" class="text-primary hover:underline">Política de Privacidade</a> da Construjá*
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <button type="submit" class="w-full bg-secondary text-white py-3 px-4 rounded-md hover:bg-green-500 transition duration-300 font-medium professional-submit-btn">
+                                Completar cadastro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <p class="text-gray-600">Já tem uma conta? <a href="login.html" class="text-primary hover:underline">Faça login</a></p>
+            </div>
+        </div>
+    </section>
+
+    <script type="module">
+    // ✅ CONFIGURE COM SUAS CREDENCIAIS DO SUPABASE
+    const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Sistema de upload de imagens (opcional)
+    document.getElementById('profilePhoto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('profilePhotoPreview');
+                preview.querySelector('img').src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Cadastro do profissional
+    document.getElementById('professionalRegistrationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Coletar dados do formulário
+        const formData = new FormData(e.target);
+        const dados = Object.fromEntries(formData);
+        
+        try {
+            // 1. Criar usuário no Auth
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: dados.email,
+                password: dados.password,
+            });
+
+            if (authError) throw authError;
+
+            // 2. Salvar perfil do profissional
+            const { error: profileError } = await supabase
+                .from('profissionais')
+                .insert([
+                    {
+                        id: authData.user.id,
+                        nome: dados.name,
+                        email: dados.email,
+                        telefone: dados.phone,
+                        cpf: dados.cpf,
+                        data_nascimento: dados.birthDate,
+                        servico_principal: dados.service,
+                        experiencia: dados.experience,
+                        descricao: dados.description,
+                        areas_atuacao: Array.from(formData.getAll('workAreas'))
+                    }
+                ]);
+
+            if (profileError) throw profileError;
+
+            alert('Cadastro realizado com sucesso!');
+            window.location.href = 'login.html';
+
+        } catch (error) {
+            console.error('Erro no cadastro:', error);
+            alert('Erro: ' + error.message);
+        }
+    });
+
+    // Menu mobile
+    feather.replace();
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+</script>
+</body>
+</html>

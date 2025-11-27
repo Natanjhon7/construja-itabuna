@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encontrar Profissionais - Construjá</title>
+    
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="profissionais.html" class="text-primary font-medium border-b-2 border-primary">Profissionais</a>
+                </div>
+                
+                <div class="flex items-center space-x-4" id="userMenu">
+                    <!-- Menu do usuário será carregado via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-primary text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold mb-4">Encontre os Melhores Profissionais</h1>
+            <p class="text-xl text-blue-100 mb-8">Mais de 100 profissionais qualificados em Itabuna e região</p>
+            
+            <!-- Search Bar -->
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-lg shadow-lg p-2 flex">
+                    <input type="text" id="searchInput" placeholder="Buscar por serviço ou especialidade..." 
+                           class="flex-1 px-4 py-2 text-gray-800 focus:outline-none rounded-l-lg">
+                    <select id="serviceFilter" class="px-4 py-2 text-gray-800 border-l border-gray-300 focus:outline-none">
+                        <option value="">Todos os serviços</option>
+                        <option value="pedreiro">Pedreiro</option>
+                        <option value="pintor">Pintor</option>
+                        <option value="eletricista">Eletricista</option>
+                        <option value="encanador">Encanador</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                    <button onclick="searchProfessionals()" class="bg-secondary text-white px-6 py-2 rounded-r-lg hover:bg-green-500 transition duration-300">
+                        <i data-feather="search" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professionals Grid -->
+    <div class="container mx-auto px-4 py-12">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Filters Sidebar -->
+            <div class="md:w-1/4">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+                    <h3 class="text-lg font-semibold mb-4">Filtros</h3>
+                    
+                    <!-- Service Type -->
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-3">Tipo de Serviço</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" value="pedreiro" class="service-filter" checked>
+                                <span class="ml-2 text-gray-700">Pedreiro</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="pintor" class="service-filter" checked>
+                                <span class="ml-2 text-gray-700">Pintor</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="eletricista" class="service-filter" checked>
+                                <span class="ml-2 text-gray-700">Eletricista</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" value="encanador" class="service-filter" checked>
+                                <span class="ml-2 text-gray-700">Encanador</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-3">Avaliação Mínima</h4>
+                        <select id="ratingFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="0">Todas as avaliações</option>
+                            <option value="4">4+ estrelas</option>
+                            <option value="3">3+ estrelas</option>
+                            <option value="2">2+ estrelas</option>
+                        </select>
+                    </div>
+
+                    <!-- Availability -->
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-3">Disponibilidade</h4>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="availableFilter" checked class="rounded">
+                            <span class="ml-2 text-gray-700">Apenas disponíveis agora</span>
+                        </label>
+                    </div>
+
+                    <button onclick="applyFilters()" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
+                        Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Professionals List -->
+            <div class="md:w-3/4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <span id="professionalsCount">0</span> Profissionais Encontrados
+                    </h2>
+                    <select id="sortFilter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" onchange="loadProfessionals()">
+                        <option value="rating">Melhor Avaliado</option>
+                        <option value="name">Ordem Alfabética</option>
+                        <option value="recent">Mais Recentes</option>
+                    </select>
+                </div>
+
+                <div id="professionalsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Professionals will be loaded here -->
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                    <p class="text-gray-600 mt-4">Carregando profissionais...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center py-12 hidden">
+                    <i data-feather="users" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">Nenhum profissional encontrado</h3>
+                    <p class="text-gray-500">Tente ajustar os filtros ou buscar por outro termo.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Configuração do Supabase
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let allProfessionals = [];
+        let currentUser = null;
+
+        // Inicializar página
+        async function initializePage() {
+            await checkAuth();
+            await loadProfessionals();
+            setupEventListeners();
+        }
+
+        // Verificar autenticação
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: usuario } = await supabase
+                    .from('usuarios')
+                    .select('nome, tipo')
+                    .eq('id', user.id)
+                    .single();
+                
+                currentUser = usuario;
+                updateUserMenu(usuario);
+            } else {
+                updateUserMenu(null);
+            }
+        }
+
+        // Atualizar menu do usuário
+        function updateUserMenu(usuario) {
+            const userMenu = document.getElementById('userMenu');
+            
+            if (usuario) {
+                userMenu.innerHTML = `
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 text-gray-800 hover:text-primary">
+                            <i data-feather="user" class="w-5 h-5"></i>
+                            <span>${usuario.nome}</span>
+                            <i data-feather="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+                            <a href="${usuario.tipo === 'profissional' ? 'professional/index.html' : 'cliente/dashboard.html'}" 
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <a href="auth/login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
+                    <a href="auth/cadastro.html" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Cadastrar</a>
+                `;
+            }
+            feather.replace();
+        }
+
+        // Carregar profissionais
+        async function loadProfessionals() {
+            showLoading(true);
+            
+            try {
+                // Buscar profissionais com dados dos usuários
+                const { data: professionals, error } = await supabase
+                    .from('profissionais')
+                    .select(`
+                        *,
+                        usuario:usuarios!inner(nome, telefone, created_at)
+                    `)
+                    .eq('disponivel', true);
+
+                if (error) throw error;
+
+                allProfessionals = professionals || [];
+                applyFilters();
+
+            } catch (error) {
+                console.error('Erro ao carregar profissionais:', error);
+                showEmptyState();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const serviceFilter = document.getElementById('serviceFilter').value;
+            const ratingFilter = parseFloat(document.getElementById('ratingFilter').value);
+            const availableFilter = document.getElementById('availableFilter').checked;
+            const selectedServices = Array.from(document.querySelectorAll('.service-filter:checked'))
+                .map(cb => cb.value);
+
+            let filtered = allProfessionals;
+
+            // Filtro de busca
+            if (searchTerm) {
+                filtered = filtered.filter(prof => 
+                    prof.usuario.nome.toLowerCase().includes(searchTerm) ||
+                    prof.especialidade.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Filtro de serviço
+            if (serviceFilter) {
+                filtered = filtered.filter(prof => 
+                    prof.especialidade === serviceFilter
+                );
+            }
+
+            // Filtro de serviços selecionados
+            if (selectedServices.length > 0) {
+                filtered = filtered.filter(prof =>
+                    selectedServices.includes(prof.especialidade)
+                );
+            }
+
+            // Filtro de avaliação
+            if (ratingFilter > 0) {
+                filtered = filtered.filter(prof => 
+                    (prof.avaliacao || 0) >= ratingFilter
+                );
+            }
+
+            // Filtro de disponibilidade
+            if (availableFilter) {
+                filtered = filtered.filter(prof => prof.disponivel);
+            }
+
+            // Ordenação
+            const sortBy = document.getElementById('sortFilter').value;
+            switch(sortBy) {
+                case 'rating':
+                    filtered.sort((a, b) => (b.avaliacao || 0) - (a.avaliacao || 0));
+                    break;
+                case 'name':
+                    filtered.sort((a, b) => a.usuario.nome.localeCompare(b.usuario.nome));
+                    break;
+                case 'recent':
+                    filtered.sort((a, b) => new Date(b.usuario.created_at) - new Date(a.usuario.created_at));
+                    break;
+            }
+
+            displayProfessionals(filtered);
+        }
+
+        // Exibir profissionais
+        function displayProfessionals(professionals) {
+            const grid = document.getElementById('professionalsGrid');
+            const countElement = document.getElementById('professionalsCount');
+
+            countElement.textContent = professionals.length;
+
+            if (professionals.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            grid.innerHTML = professionals.map(prof => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-gray-200 rounded-full w-16 h-16 flex items-center justify-center">
+                                <i data-feather="user" class="text-gray-500"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-lg text-gray-800">${prof.usuario.nome}</h3>
+                                <p class="text-primary font-medium">${prof.especialidade}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    ${generateStarRating(prof.avaliacao || 0)}
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">${(prof.avaliacao || 0).toFixed(1)}</span>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full ${prof.disponivel ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${prof.disponivel ? 'Disponível' : 'Indisponível'}
+                            </span>
+                        </div>
+
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            ${prof.descricao || 'Profissional qualificado e experiente.'}
+                        </p>
+
+                        <div class="flex space-x-2">
+                            <button onclick="viewProfile('${prof.id}')" 
+                                    class="flex-1 bg-gray-100 text-gray-800 py-2 px-4 rounded hover:bg-gray-200 transition duration-300 text-sm">
+                                Ver Perfil
+                            </button>
+                            <button onclick="startChat('${prof.id}', '${prof.usuario.nome}')" 
+                                    class="flex-1 bg-primary text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 text-sm">
+                                Conversar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            feather.replace();
+            hideEmptyState();
+        }
+
+        // Gerar estrelas de avaliação
+        function generateStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+            let stars = '';
+            
+            // Estrelas cheias
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i data-feather="star" class="w-4 h-4 fill-current"></i>';
+            }
+            
+            // Meia estrela
+            if (hasHalfStar) {
+                stars += '<i data-feather="star" class="w-4 h-4 fill-current" style="fill: url(#half-star)"></i>';
+            }
+            
+            // Estrelas vazias
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i data-feather="star" class="w-4 h-4"></i>';
+            }
+
+            return stars;
+        }
+
+        // Buscar profissionais
+        function searchProfessionals() {
+            applyFilters();
+        }
+
+        // Ver perfil do profissional
+        function viewProfile(professionalId) {
+            // Redirecionar para página de perfil ou mostrar modal
+            alert(`Visualizando perfil do profissional ${professionalId}`);
+            // window.location.href = `professional/profile.html?id=${professionalId}`;
+        }
+
+        // Iniciar chat
+        function startChat(professionalId, professionalName) {
+            if (!currentUser) {
+                alert('Por favor, faça login para iniciar uma conversa.');
+                window.location.href = 'auth/login.html';
+                return;
+            }
+
+            // Aqui você pode implementar o sistema de chat
+            alert(`Iniciando conversa com ${professionalName}`);
+            // chatSystem.openChat(professionalId, professionalName);
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = 'auth/login.html';
+        }
+
+        // Estados da UI
+        function showLoading(show) {
+            document.getElementById('loadingState').classList.toggle('hidden', !show);
+        }
+
+        function showEmptyState() {
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('professionalsGrid').innerHTML = '';
+        }
+
+        function hideEmptyState() {
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchProfessionals();
+            });
+
+            document.getElementById('serviceFilter').addEventListener('change', applyFilters);
+            document.getElementById('ratingFilter').addEventListener('change', applyFilters);
+            document.getElementById('availableFilter').addEventListener('change', applyFilters);
+            
+            document.querySelectorAll('.service-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', applyFilters);
+            });
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+    
+</body>
+</html>

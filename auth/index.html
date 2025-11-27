@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecionando - Construjá</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script>
+        // Redirecionamento simples e direto
+        window.location.href = 'login.html';
+    </script>
+</head>
+<!-- Inclua o script -->
+<script src="js/carregar-profissionais.js"></script>
+
+<script>
+// Carregar profissionais quando a página abrir
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Carregando profissionais...');
+    
+    const profissionais = await carregarProfissionais();
+    console.log('Profissionais carregados:', profissionais);
+    
+    exibirProfissionais(profissionais);
+});
+</script>
+<body>
+    <p>Redirecionando para login...</p>
+</body>
+</html>

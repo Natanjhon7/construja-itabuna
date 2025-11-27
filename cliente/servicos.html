@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Serviços - Construjá</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="../profissionais.html" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-gray-800 hover:text-primary font-medium">Dashboard</a>
+                    <a href="#" onclick="logout()" class="text-gray-800 hover:text-primary font-medium">Sair</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Meus Serviços</h1>
+            <a href="../solicitar-servico.html" 
+               class="bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-600 transition duration-300 font-medium">
+                <i data-feather="plus" class="w-4 h-4 inline mr-2"></i>
+                Novo Serviço
+            </a>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex space-x-4 overflow-x-auto">
+                <button class="filter-tab active px-4 py-2 rounded-md font-medium" data-status="all">
+                    Todos
+                </button>
+                <button class="filter-tab px-4 py-2 rounded-md font-medium" data-status="solicitado">
+                    Solicitados
+                </button>
+                <button class="filter-tab px-4 py-2 rounded-md font-medium" data-status="orcamento_enviado">
+                    Orçamentos
+                </button>
+                <button class="filter-tab px-4 py-2 rounded-md font-medium" data-status="em_andamento">
+                    Em Andamento
+                </button>
+                <button class="filter-tab px-4 py-2 rounded-md font-medium" data-status="concluido">
+                    Concluídos
+                </button>
+            </div>
+        </div>
+
+        <!-- Services List -->
+        <div id="servicesList" class="space-y-4">
+            <!-- Services will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <i data-feather="briefcase" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">Nenhum serviço encontrado</h3>
+            <p class="text-gray-500 mb-4">Você ainda não solicitou nenhum serviço.</p>
+            <a href="../solicitar-servico.html" 
+               class="bg-primary text-white px-6 py-3 rounded-md hover:bg-blue-600 transition duration-300 font-medium">
+                Solicitar Primeiro Serviço
+            </a>
+        </div>
+    </div>
+
+    <script type="module">
+        // Configuração do Supabase
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let services = [];
+
+        // Inicializar página
+        async function initializePage() {
+            await checkAuth();
+            await loadServices();
+            setupEventListeners();
+        }
+
+        // Verificar autenticação
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: usuario } = await supabase
+                    .from('usuarios')
+                    .select('nome, tipo')
+                    .eq('id', user.id)
+                    .single();
+                
+                currentUser = usuario;
+
+                if (usuario.tipo !== 'cliente') {
+                    window.location.href = '../professional/index.html';
+                }
+            } else {
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Carregar serviços
+        async function loadServices(filterStatus = 'all') {
+            let query = supabase
+                .from('servicos')
+                .select(`
+                    *,
+                    profissional:usuarios!servicos_profissional_id_fkey(nome, telefone)
+                `)
+                .eq('cliente_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (filterStatus !== 'all') {
+                query = query.eq('status', filterStatus);
+            }
+
+            const { data: servicos, error } = await query;
+
+            if (error) {
+                console.error('Erro ao carregar serviços:', error);
+                return;
+            }
+
+            services = servicos || [];
+            renderServices();
+        }
+
+        // Renderizar serviços
+        function renderServices() {
+            const container = document.getElementById('servicesList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (services.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            container.innerHTML = services.map(servico => `
+                <div class="bg-white rounded-lg shadow-md p-6 service-card" data-status="${servico.status}">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">${servico.titulo}</h3>
+                                    <p class="text-gray-600">${servico.tipo_servico}</p>
+                                </div>
+                                <span class="status-badge ${getStatusBadgeClass(servico.status)}">
+                                    ${getStatusText(servico.status)}
+                                </span>
+                            </div>
+                            
+                            <p class="text-gray-700 mb-4">${servico.descricao}</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                                <div>
+                                    <strong>Local:</strong>
+                                    <p class="truncate">${servico.endereco_servico}</p>
+                                </div>
+                                <div>
+                                    <strong>Data:</strong>
+                                    <p>${new Date(servico.data_solicitacao).toLocaleDateString('pt-BR')}</p>
+                                </div>
+                                ${servico.orcamento ? `
+                                    <div>
+                                        <strong>Orçamento:</strong>
+                                        <p class="text-green-600 font-semibold">R$ ${parseFloat(servico.orcamento).toFixed(2)}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            ${servico.profissional ? `
+                                <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                                    <p class="text-sm">
+                                        <strong>Profissional:</strong> ${servico.profissional.nome}
+                                        ${servico.profissional.telefone ? ` - ${servico.profissional.telefone}` : ''}
+                                    </p>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="mt-4 md:mt-0 md:ml-6 flex space-x-2">
+                            ${servico.status === 'solicitado' ? `
+                                <button onclick="cancelService('${servico.id}')" 
+                                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 text-sm">
+                                    Cancelar
+                                </button>
+                            ` : ''}
+                            
+                            ${servico.status === 'concluido' && !servico.avaliacao_cliente ? `
+                                <button onclick="rateService('${servico.id}')" 
+                                        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition duration-300 text-sm">
+                                    Avaliar
+                                </button>
+                            ` : ''}
+
+                            <button onclick="viewServiceDetails('${servico.id}')" 
+                                    class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm">
+                                Detalhes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Utilitários de status
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'solicitado': 'bg-yellow-100 text-yellow-800',
+                'orcamento_enviado': 'bg-blue-100 text-blue-800',
+                'orcamento_aceito': 'bg-purple-100 text-purple-800',
+                'em_andamento': 'bg-green-100 text-green-800',
+                'concluido': 'bg-gray-100 text-gray-800',
+                'cancelado': 'bg-red-100 text-red-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'solicitado': 'Solicitado',
+                'orcamento_enviado': 'Orçamento Enviado',
+                'orcamento_aceito': 'Orçamento Aceito',
+                'em_andamento': 'Em Andamento',
+                'concluido': 'Concluído',
+                'cancelado': 'Cancelado'
+            };
+            return texts[status] || status;
+        }
+
+        // Filtrar serviços
+        function setupEventListeners() {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Atualizar tabs ativas
+                    document.querySelectorAll('.filter-tab').forEach(t => {
+                        t.classList.remove('active', 'bg-primary', 'text-white');
+                        t.classList.add('text-gray-600', 'hover:bg-gray-100');
+                    });
+                    
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                    
+                    // Carregar serviços com filtro
+                    const status = this.dataset.status;
+                    loadServices(status);
+                });
+            });
+        }
+
+        // Ver detalhes do serviço
+        function viewServiceDetails(serviceId) {
+            const service = services.find(s => s.id === serviceId);
+            if (service) {
+                alert(`Detalhes do serviço: ${service.titulo}\n\nStatus: ${getStatusText(service.status)}\nDescrição: ${service.descricao}`);
+            }
+        }
+
+        // Cancelar serviço
+        async function cancelService(serviceId) {
+            if (!confirm('Tem certeza que deseja cancelar este serviço?')) return;
+
+            const { error } = await supabase
+                .from('servicos')
+                .update({ status: 'cancelado' })
+                .eq('id', serviceId);
+
+            if (error) {
+                alert('Erro ao cancelar serviço.');
+                return;
+            }
+
+            alert('Serviço cancelado com sucesso.');
+            loadServices();
+        }
+
+        // Avaliar serviço
+        function rateService(serviceId) {
+            const rating = prompt('De 1 a 5 estrelas, como você avalia este serviço?');
+            if (rating && rating >= 1 && rating <= 5) {
+                // Implementar avaliação
+                alert(`Obrigado pela avaliação de ${rating} estrelas!`);
+            }
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = '../auth/login.html';
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <style>
+        .filter-tab.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamentos - Construjá</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="../profissionais.html" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-gray-800 hover:text-primary font-medium">Dashboard</a>
+                    <a href="#" onclick="logout()" class="text-gray-800 hover:text-primary font-medium">Sair</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Meus Pagamentos</h1>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                        <i data-feather="clock" class="text-yellow-500 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Pagamentos Pendentes</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="pendingCount">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-full mr-4">
+                        <i data-feather="check-circle" class="text-secondary w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Pagamentos Concluídos</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="completedCount">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                        <i data-feather="dollar-sign" class="text-primary w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Total Pago</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="totalPaid">R$ 0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 p-3 rounded-full mr-4">
+                        <i data-feather="credit-card" class="text-purple-500 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Próximo Vencimento</p>
+                        <h3 class="text-2xl font-bold text-gray-800" id="nextDue">-</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex space-x-4 overflow-x-auto">
+                <button class="filter-tab active px-4 py-2 rounded-md font-medium" data-status="all">
+                    Todos
+                </button>
+                <button class="filter-tab px-4 py-2 rounded-md font-medium" data-status="pendente">
+                    Pendentes
+                </button>
+                <button class="filter-tab px-4 py-2 rounded-md font-medium" data-status="processando">
+                    Processando
+                </button>
+                <button class="filter-tab px-4 py-2 rounded-md font-medium" data-status="concluido">
+                    Concluídos
+                </button>
+            </div>
+        </div>
+
+        <!-- Payments List -->
+        <div id="paymentsList" class="space-y-4">
+            <!-- Payments will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <i data-feather="credit-card" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">Nenhum pagamento encontrado</h3>
+            <p class="text-gray-500">Você ainda não tem pagamentos registrados.</p>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
+                <h3 class="text-lg font-semibold" id="paymentModalTitle">Realizar Pagamento</h3>
+                <button onclick="closePaymentModal()" class="text-white hover:text-blue-200">
+                    <i data-feather="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div id="paymentDetails" class="mb-6">
+                    <!-- Payment details will be loaded here -->
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-gray-800">Método de Pagamento</h4>
+                    
+                    <!-- PIX Option -->
+                    <div class="border border-gray-200 rounded-lg p-4 hover:border-primary cursor-pointer payment-method" data-method="pix">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-2 rounded-full mr-3">
+                                <i data-feather="dollar-sign" class="text-green-600 w-4 h-4"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium">PIX</p>
+                                <p class="text-sm text-gray-600">Pagamento instantâneo</p>
+                            </div>
+                            <i data-feather="check" class="text-primary hidden w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <!-- Cartão de Crédito -->
+                    <div class="border border-gray-200 rounded-lg p-4 hover:border-primary cursor-pointer payment-method" data-method="cartao_credito">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-2 rounded-full mr-3">
+                                <i data-feather="credit-card" class="text-blue-600 w-4 h-4"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium">Cartão de Crédito</p>
+                                <p class="text-sm text-gray-600">Parcelado em até 12x</p>
+                            </div>
+                            <i data-feather="check" class="text-primary hidden w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <!-- Transferência -->
+                    <div class="border border-gray-200 rounded-lg p-4 hover:border-primary cursor-pointer payment-method" data-method="transferencia">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 p-2 rounded-full mr-3">
+                                <i data-feather="repeat" class="text-purple-600 w-4 h-4"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium">Transferência Bancária</p>
+                                <p class="text-sm text-gray-600">TED/DOC</p>
+                            </div>
+                            <i data-feather="check" class="text-primary hidden w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <button id="confirmPaymentBtn" onclick="processPayment()" 
+                            class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-blue-600 transition duration-300 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            disabled>
+                        Confirmar Pagamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIX Modal -->
+    <div id="pixModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="bg-green-500 text-white p-4 rounded-t-lg flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Pagamento via PIX</h3>
+                <button onclick="closePixModal()" class="text-white hover:text-green-200">
+                    <i data-feather="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 text-center">
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-600 mb-2">Valor a pagar</p>
+                    <p class="text-2xl font-bold text-gray-800" id="pixAmount">R$ 0,00</p>
+                </div>
+
+                <div id="pixQrCode" class="mb-4 p-4 bg-white border-2 border-dashed border-gray-300 rounded-lg">
+                    <p class="text-gray-500">Gerando QR Code PIX...</p>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                    <p class="text-sm text-yellow-800">
+                        <i data-feather="clock" class="w-4 h-4 inline mr-1"></i>
+                        Este PIX expira em <strong>30 minutos</strong>
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="copyPixCode()" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">
+                        <i data-feather="copy" class="w-4 h-4 inline mr-2"></i>
+                        Copiar Código PIX
+                    </button>
+                    <button onclick="markAsPaid()" class="w-full bg-primary text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">
+                        <i data-feather="check" class="w-4 h-4 inline mr-2"></i>
+                        Já Paguei
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Configuração do Supabase
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let payments = [];
+        let selectedPayment = null;
+        let selectedMethod = null;
+
+        // Inicializar página
+        async function initializePage() {
+            await checkAuth();
+            await loadPayments();
+            await loadStats();
+            setupEventListeners();
+        }
+
+        // Verificar autenticação
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: usuario } = await supabase
+                    .from('usuarios')
+                    .select('nome, tipo')
+                    .eq('id', user.id)
+                    .single();
+                
+                currentUser = usuario;
+
+                if (usuario.tipo !== 'cliente') {
+                    window.location.href = '../professional/index.html';
+                }
+            } else {
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Carregar pagamentos
+        async function loadPayments(filterStatus = 'all') {
+            let query = supabase
+                .from('transacoes')
+                .select(`
+                    *,
+                    servico:servicos!inner(titulo, tipo_servico),
+                    profissional:usuarios!transacoes_profissional_id_fkey(nome)
+                `)
+                .eq('cliente_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (filterStatus !== 'all') {
+                query = query.eq('status', filterStatus);
+            }
+
+            const { data: transacoes, error } = await query;
+
+            if (error) {
+                console.error('Erro ao carregar pagamentos:', error);
+                return;
+            }
+
+            payments = transacoes || [];
+            renderPayments();
+        }
+
+        // Carregar estatísticas
+        async function loadStats() {
+            const { data: transacoes, error } = await supabase
+                .from('transacoes')
+                .select('status, valor')
+                .eq('cliente_id', currentUser.id);
+
+            if (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+                return;
+            }
+
+            const pendentes = transacoes.filter(t => t.status === 'pendente').length;
+            const concluidos = transacoes.filter(t => t.status === 'concluido').length;
+            const totalPago = transacoes
+                .filter(t => t.status === 'concluido')
+                .reduce((total, transacao) => total + parseFloat(transacao.valor || 0), 0);
+
+            // Próximo vencimento
+            const proximoVencimento = transacoes
+                .filter(t => t.status === 'pendente' && t.data_vencimento)
+                .sort((a, b) => new Date(a.data_vencimento) - new Date(b.data_vencimento))[0];
+
+            document.getElementById('pendingCount').textContent = pendentes;
+            document.getElementById('completedCount').textContent = concluidos;
+            document.getElementById('totalPaid').textContent = `R$ ${totalPago.toFixed(2)}`;
+            document.getElementById('nextDue').textContent = proximoVencimento 
+                ? new Date(proximoVencimento.data_vencimento).toLocaleDateString('pt-BR')
+                : '-';
+        }
+
+        // Renderizar pagamentos
+        function renderPayments() {
+            const container = document.getElementById('paymentsList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (payments.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            container.innerHTML = payments.map(payment => `
+                <div class="bg-white rounded-lg shadow-md p-6 payment-card" data-status="${payment.status}">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">${payment.servico.titulo}</h3>
+                                    <p class="text-gray-600">${payment.servico.tipo_servico}</p>
+                                </div>
+                                <span class="status-badge ${getStatusBadgeClass(payment.status)}">
+                                    ${getStatusText(payment.status)}
+                                </span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
+                                <div>
+                                    <strong>Profissional:</strong>
+                                    <p>${payment.profissional.nome}</p>
+                                </div>
+                                <div>
+                                    <strong>Valor:</strong>
+                                    <p class="text-green-600 font-semibold">R$ ${parseFloat(payment.valor).toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <strong>Vencimento:</strong>
+                                    <p>${payment.data_vencimento ? new Date(payment.data_vencimento).toLocaleDateString('pt-BR') : 'Não definido'}</p>
+                                </div>
+                                <div>
+                                    <strong>Método:</strong>
+                                    <p>${getPaymentMethodText(payment.metodo_pagamento)}</p>
+                                </div>
+                            </div>
+
+                            ${payment.descricao ? `
+                                <p class="text-gray-700 text-sm bg-gray-50 p-3 rounded-md">${payment.descricao}</p>
+                            ` : ''}
+                        </div>
+
+                        <div class="mt-4 lg:mt-0 lg:ml-6 flex space-x-2">
+                            ${payment.status === 'pendente' ? `
+                                <button onclick="openPaymentModal('${payment.id}')" 
+                                        class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 text-sm">
+                                    Pagar
+                                </button>
+                            ` : ''}
+                            
+                            ${payment.status === 'concluido' ? `
+                                <button onclick="downloadReceipt('${payment.id}')" 
+                                        class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300 text-sm">
+                                    Recibo
+                                </button>
+                            ` : ''}
+
+                            <button onclick="viewPaymentDetails('${payment.id}')" 
+                                    class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition duration-300 text-sm">
+                                Detalhes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            feather.replace();
+        }
+
+        // Abrir modal de pagamento
+        async function openPaymentModal(paymentId) {
+            selectedPayment = payments.find(p => p.id === paymentId);
+            if (!selectedPayment) return;
+
+            const modal = document.getElementById('paymentModal');
+            const title = document.getElementById('paymentModalTitle');
+            const details = document.getElementById('paymentDetails');
+
+            title.textContent = `Pagar ${selectedPayment.servico.titulo}`;
+            
+            details.innerHTML = `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600">Valor:</span>
+                        <span class="text-xl font-bold text-green-600">R$ ${parseFloat(selectedPayment.valor).toFixed(2)}</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600">Profissional:</span>
+                        <span class="font-medium">${selectedPayment.profissional.nome}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Vencimento:</span>
+                        <span class="font-medium">${selectedPayment.data_vencimento ? new Date(selectedPayment.data_vencimento).toLocaleDateString('pt-BR') : 'Não definido'}</span>
+                    </div>
+                </div>
+            `;
+
+            // Reset selection
+            selectedMethod = null;
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.classList.remove('border-primary', 'bg-blue-50');
+                method.querySelector('i.feather-check').classList.add('hidden');
+            });
+            document.getElementById('confirmPaymentBtn').disabled = true;
+
+            modal.classList.remove('hidden');
+            feather.replace();
+        }
+
+        // Fechar modal de pagamento
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            selectedPayment = null;
+            selectedMethod = null;
+        }
+
+        // Selecionar método de pagamento
+        function setupEventListeners() {
+            // Filtros
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => {
+                        t.classList.remove('active', 'bg-primary', 'text-white');
+                        t.classList.add('text-gray-600', 'hover:bg-gray-100');
+                    });
+                    
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                    
+                    const status = this.dataset.status;
+                    loadPayments(status);
+                });
+            });
+
+            // Métodos de pagamento
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.classList.remove('border-primary', 'bg-blue-50');
+                        m.querySelector('i.feather-check').classList.add('hidden');
+                    });
+                    
+                    this.classList.add('border-primary', 'bg-blue-50');
+                    this.querySelector('i.feather-check').classList.remove('hidden');
+                    
+                    selectedMethod = this.dataset.method;
+                    document.getElementById('confirmPaymentBtn').disabled = false;
+                });
+            });
+        }
+
+        // Processar pagamento
+        async function processPayment() {
+            if (!selectedPayment || !selectedMethod) return;
+
+            if (selectedMethod === 'pix') {
+                await processPixPayment();
+            } else {
+                // Para outros métodos, marcar como processando
+                const { error } = await supabase
+                    .from('transacoes')
+                    .update({
+                        status: 'processando',
+                        metodo_pagamento: selectedMethod,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', selectedPayment.id);
+
+                if (error) {
+                    alert('Erro ao processar pagamento.');
+                    return;
+                }
+
+                alert('Pagamento em processamento! Em breve você receberá as instruções.');
+                closePaymentModal();
+                loadPayments();
+                loadStats();
+            }
+        }
+
+        // Processar pagamento PIX
+        async function processPixPayment() {
+            // Gerar código PIX (simulação)
+            const pixCode = generatePixCode(selectedPayment.valor, selectedPayment.id);
+            
+            // Atualizar transação
+            const { error } = await supabase
+                .from('transacoes')
+                .update({
+                    status: 'processando',
+                    metodo_pagamento: 'pix',
+                    codigo_pix: pixCode.code,
+                    qr_code: pixCode.qrCode,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', selectedPayment.id);
+
+            if (error) {
+                alert('Erro ao gerar PIX.');
+                return;
+            }
+
+            // Mostrar modal PIX
+            showPixModal(pixCode);
+        }
+
+        // Gerar código PIX (simulação)
+        function generatePixCode(valor, paymentId) {
+            // Em produção, integrar com API de PIX real
+            const code = `00020126580014br.gov.bcb.pix0136${paymentId}${Date.now()}5204000053039865406${valor.toFixed(2)}5802BR5913CONSTRUJA ITABUNA6008ITABUNA62070503***6304`;
+            
+            return {
+                code: code,
+                qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(code)}`
+            };
+        }
+
+        // Mostrar modal PIX
+        function showPixModal(pixCode) {
+            document.getElementById('pixAmount').textContent = `R$ ${parseFloat(selectedPayment.valor).toFixed(2)}`;
+            document.getElementById('pixQrCode').innerHTML = `
+                <img src="${pixCode.qrCode}" alt="QR Code PIX" class="mx-auto">
+                <p class="text-xs text-gray-500 mt-2">Escaneie o QR Code com seu app bancário</p>
+            `;
+            
+            document.getElementById('paymentModal').classList.add('hidden');
+            document.getElementById('pixModal').classList.remove('hidden');
+        }
+
+        // Fechar modal PIX
+        function closePixModal() {
+            document.getElementById('pixModal').classList.add('hidden');
+            selectedPayment = null;
+            selectedMethod = null;
+        }
+
+        // Copiar código PIX
+        function copyPixCode() {
+            const payment = payments.find(p => p.id === selectedPayment.id);
+            if (payment && payment.codigo_pix) {
+                navigator.clipboard.writeText(payment.codigo_pix);
+                alert('Código PIX copiado!');
+            }
+        }
+
+        // Marcar como pago (simulação)
+        async function markAsPaid() {
+            const { error } = await supabase
+                .from('transacoes')
+                .update({
+                    status: 'concluido',
+                    data_pagamento: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', selectedPayment.id);
+
+            if (error) {
+                alert('Erro ao confirmar pagamento.');
+                return;
+            }
+
+            alert('Pagamento confirmado com sucesso!');
+            closePixModal();
+            loadPayments();
+            loadStats();
+        }
+
+        // Utilitários
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'pendente': 'bg-yellow-100 text-yellow-800',
+                'processando': 'bg-blue-100 text-blue-800',
+                'concluido': 'bg-green-100 text-green-800',
+                'falhou': 'bg-red-100 text-red-800',
+                'cancelado': 'bg-gray-100 text-gray-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'pendente': 'Pendente',
+                'processando': 'Processando',
+                'concluido': 'Concluído',
+                'falhou': 'Falhou',
+                'cancelado': 'Cancelado'
+            };
+            return texts[status] || status;
+        }
+
+        function getPaymentMethodText(method) {
+            const texts = {
+                'pix': 'PIX',
+                'cartao_credito': 'Cartão de Crédito',
+                'cartao_debito': 'Cartão de Débito',
+                'transferencia': 'Transferência',
+                'dinheiro': 'Dinheiro'
+            };
+            return texts[method] || method || 'Não definido';
+        }
+
+        // Download recibo
+        function downloadReceipt(paymentId) {
+            alert('Funcionalidade de recibo em desenvolvimento!');
+        }
+
+        // Ver detalhes do pagamento
+        function viewPaymentDetails(paymentId) {
+            const payment = payments.find(p => p.id === paymentId);
+            if (payment) {
+                alert(`Detalhes do pagamento:\n\nServiço: ${payment.servico.titulo}\nValor: R$ ${payment.valor}\nStatus: ${getStatusText(payment.status)}\nMétodo: ${getPaymentMethodText(payment.metodo_pagamento)}`);
+            }
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = '../auth/login.html';
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <style>
+        .filter-tab.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .payment-method.selected {
+            border-color: #3B82F6;
+            background-color: #EFF6FF;
+        }
+    </style>
+</body>
+</html>

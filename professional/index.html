@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Profissional - Construjá</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+
+        // 🔥 FUNÇÕES FORA DO MÓDULO - ACESSÍVEIS GLOBALMENTE
+        function editProfile() {
+            alert('Em desenvolvimento: Editar perfil');
+        }
+
+        function editServices() {
+            alert('Em desenvolvimento: Editar serviços');
+        }
+
+        function updateAvailability() {
+            alert('Em desenvolvimento: Atualizar disponibilidade');
+        }
+
+        function viewMessages() {
+            alert('Em desenvolvimento: Ver mensagens');
+        }
+
+        function viewPortfolio() {
+            alert('Em desenvolvimento: Ver portfólio');
+        }
+
+        function logout() {
+            if (confirm('Deseja sair da sua conta?')) {
+                // Chamar função do módulo via window
+                if (window.supabaseLogout) {
+                    window.supabaseLogout();
+                } else {
+                    window.location.href = '../auth/login.html';
+                }
+            }
+        }
+    </script>
+    <style>
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .services-card {
+            border-left: 4px solid #10B981;
+        }
+        .profile-card {
+            border-left: 4px solid #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-6">
+                    <span class="text-gray-600">Bem-vindo, <span id="userName">Profissional</span>!</span>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300">
+                        Sair
+                    </button>
+                </div>
+                
+                <button class="md:hidden focus:outline-none mobile-menu-button">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Dashboard do Profissional</h1>
+            <p class="text-gray-600">Gerencie seus serviços e oportunidades</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="stats-card rounded-lg p-6 text-white">
+                <div class="flex items-center">
+                    <i data-feather="briefcase" class="h-8 w-8 mr-3"></i>
+                    <div>
+                        <p class="text-2xl font-bold" id="jobsCount">0</p>
+                        <p class="text-blue-100">Jobs Concluídos</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <div class="flex items-center">
+                    <i data-feather="star" class="h-8 w-8 mr-3 text-yellow-500"></i>
+                    <div>
+                        <p class="text-2xl font-bold" id="rating">5.0</p>
+                        <p class="text-gray-600">Avaliação</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <div class="flex items-center">
+                    <i data-feather="dollar-sign" class="h-8 w-8 mr-3 text-green-500"></i>
+                    <div>
+                        <p class="text-2xl font-bold" id="earnings">R$ 0</p>
+                        <p class="text-gray-600">Ganhos Totais</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Serviços e Perfil -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Meus Serviços -->
+                <div class="bg-white rounded-lg shadow-md p-6 services-card">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-feather="tool" class="mr-2 text-secondary"></i>
+                        Meus Serviços
+                    </h2>
+                    <div id="myServices" class="space-y-3">
+                        <p class="text-gray-600">Carregando seus serviços...</p>
+                    </div>
+                    <button onclick="editServices()" class="mt-4 bg-secondary text-white px-4 py-2 rounded-lg hover:bg-green-500 transition duration-300">
+                        Editar Serviços
+                    </button>
+                </div>
+
+                <!-- Oportunidades Recentes -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-feather="bell" class="mr-2 text-primary"></i>
+                        Oportunidades Recentes
+                    </h2>
+                    <div id="opportunities">
+                        <p class="text-gray-600">Nenhuma oportunidade no momento.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Perfil e Ações Rápidas -->
+            <div class="space-y-6">
+                <!-- Perfil -->
+                <div class="bg-white rounded-lg shadow-md p-6 profile-card">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-feather="user" class="mr-2 text-primary"></i>
+                        Meu Perfil
+                    </h2>
+                    <div id="profileInfo">
+                        <p class="text-gray-600">Carregando perfil...</p>
+                    </div>
+                    <button onclick="editProfile()" class="mt-4 w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                        Editar Perfil
+                    </button>
+                </div>
+
+                <!-- Ações Rápidas -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold mb-4">Ações Rápidas</h2>
+                    <div class="space-y-3">
+                        <button onclick="updateAvailability()" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300">
+                            Disponível para Trabalhos
+                        </button>
+                        <button onclick="viewMessages()" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                            Ver Mensagens
+                        </button>
+                        <button onclick="viewPortfolio()" class="w-full bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600 transition duration-300">
+                            Meu Portfólio
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Configuração do Supabase
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Tornar logout acessível globalmente
+        window.supabaseLogout = function() {
+            supabase.auth.signOut();
+            window.location.href = '../auth/login.html';
+        };
+
+        // Verificar autenticação
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                window.location.href = '../auth/login.html';
+                return;
+            }
+
+            // Carregar dados do usuário
+            await loadUserData(user.id);
+        }
+
+        // Carregar dados do usuário
+        async function loadUserData(userId) {
+            try {
+                const { data: usuario, error } = await supabase
+                    .from('usuarios')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) throw error;
+
+                // Atualizar interface
+                document.getElementById('userName').textContent = usuario.nome || 'Profissional';
+                document.getElementById('profileInfo').innerHTML = `
+                    <p><strong>Nome:</strong> ${usuario.nome}</p>
+                    <p><strong>Email:</strong> ${usuario.email}</p>
+                    <p><strong>Telefone:</strong> ${usuario.telefone}</p>
+                    <p><strong>Serviço:</strong> ${usuario.servico_principal}</p>
+                    <p><strong>Experiência:</strong> ${usuario.experiencia} anos</p>
+                `;
+
+                // Carregar serviços
+                document.getElementById('myServices').innerHTML = `
+                    <div class="bg-gray-50 p-3 rounded">
+                        <p class="font-semibold">${usuario.servico_principal}</p>
+                        <p class="text-sm text-gray-600">${usuario.descricao}</p>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            feather.replace();
+        });
+    </script>
+    <!-- Inclua o script -->
+<script src="js/carregar-profissionais.js"></script>
+
+<script>
+// Carregar profissionais quando a página abrir
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Carregando profissionais...');
+    
+    const profissionais = await carregarProfissionais();
+    console.log('Profissionais carregados:', profissionais);
+    
+    exibirProfissionais(profissionais);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Construjá Itabuna</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation (mantenha igual) -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="#" class="text-gray-800 hover:text-primary font-medium">Serviços</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="login.html" class="text-gray-800 hover:text-primary font-medium">Entrar</a>
+                </div>
+                
+                <button class="md:hidden focus:outline-none mobile-menu-button">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden mt-4">
+                <a href="../index.html" class="block py-2 text-gray-800 hover:text-primary">Home</a>
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Serviços</a>
+                <a href="#" class="block py-2 text-gray-800 hover:text-primary">Como Funciona</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Form -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-primary text-white py-4 px-6">
+                    <h2 class="text-2xl font-bold">Crie sua conta</h2>
+                    <p class="text-blue-100">Escolha o tipo de cadastro</p>
+                </div>
+                
+                <div class="p-6">
+                    <div class="flex mb-6">
+                        <button id="clientTab" class="flex-1 py-2 font-medium border-b-2 border-primary text-primary tab-button active">
+                            Sou Cliente
+                        </button>
+                        <button id="professionalTab" class="flex-1 py-2 font-medium border-b-2 border-transparent text-gray-500 tab-button">
+                            Sou Profissional
+                        </button>
+                    </div>
+                    
+                    <!-- Client Form -->
+                    <div id="clientForm" class="form-container active">
+                        <form id="clientRegistrationForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="name">Nome completo</label>
+                                <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="email">E-mail</label>
+                                <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="phone">Telefone</label>
+                                <input type="tel" id="phone" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-gray-700 mb-2" for="password">Senha</label>
+                                <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required minlength="6">
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 font-medium">
+                                Cadastrar como cliente
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Professional Form -->
+                    <div id="professionalForm" class="form-container hidden">
+                        <form id="professionalRegistrationForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="proName">Nome completo</label>
+                                <input type="text" id="proName" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="proEmail">E-mail</label>
+                                <input type="email" id="proEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="proPhone">Telefone</label>
+                                <input type="tel" id="proPhone" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="proService">Serviço oferecido</label>
+                                <select id="proService" name="service" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="pedreiro">Pedreiro</option>
+                                    <option value="pintor">Pintor</option>
+                                    <option value="eletricista">Eletricista</option>
+                                    <option value="encanador">Encanador</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-gray-700 mb-2" for="proPassword">Senha</label>
+                                <input type="password" id="proPassword" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required minlength="6">
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-green-500 transition duration-300 font-medium">
+                                Cadastrar como profissional
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-gray-600">Já tem uma conta? <a href="login.html" class="text-primary hover:underline">Faça login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🔥 SUBSTITUA O FIREBASE POR SUPABASE -->
+    <script type="module">
+        // Configuração do Supabase - SUBSTITUA COM SUAS CREDENCIAIS
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Sistema de tabs (mantenha do seu código)
+        const clientTab = document.getElementById('clientTab');
+        const professionalTab = document.getElementById('professionalTab');
+        const clientForm = document.getElementById('clientForm');
+        const professionalForm = document.getElementById('professionalForm');
+        
+        if (clientTab && professionalTab) {
+            clientTab.addEventListener('click', function() {
+                switchToTab('client');
+            });
+            
+            professionalTab.addEventListener('click', function() {
+                switchToTab('professional');
+            });
+        }
+
+        function switchToTab(tabType) {
+            if (tabType === 'client') {
+                clientTab.classList.add('active', 'border-primary', 'text-primary');
+                clientTab.classList.remove('border-transparent', 'text-gray-500');
+                professionalTab.classList.add('border-transparent', 'text-gray-500');
+                professionalTab.classList.remove('active', 'border-primary', 'text-primary');
+                
+                clientForm.classList.remove('hidden');
+                clientForm.classList.add('active');
+                professionalForm.classList.add('hidden');
+                professionalForm.classList.remove('active');
+            } else {
+                professionalTab.classList.add('active', 'border-primary', 'text-primary');
+                professionalTab.classList.remove('border-transparent', 'text-gray-500');
+                clientTab.classList.add('border-transparent', 'text-gray-500');
+                clientTab.classList.remove('active', 'border-primary', 'text-primary');
+                
+                professionalForm.classList.remove('hidden');
+                professionalForm.classList.add('active');
+                clientForm.classList.add('hidden');
+                clientForm.classList.remove('active');
+            }
+        }
+
+        // CADASTRO DE CLIENTE COM SUPABASE
+        document.getElementById("clientRegistrationForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nome = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const telefone = document.getElementById("phone").value;
+            const senha = document.getElementById("password").value;
+
+            try {
+                // 1. Criar usuário no Auth do Supabase
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: senha,
+                });
+
+                if (authError) throw authError;
+
+                // 2. Salvar dados no perfil
+                const { data: profileData, error: profileError } = await supabase
+                    .from('usuarios')
+                    .insert([
+                        {
+                            id: authData.user.id,
+                            email: email,
+                            nome: nome,
+                            telefone: telefone,
+                            tipo: 'cliente'
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (profileError) throw profileError;
+
+                alert("Cliente cadastrado com sucesso!");
+                window.location.href = "login.html";
+
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                alert("Erro: " + error.message);
+            }
+        });
+
+        // CADASTRO DE PROFISSIONAL COM SUPABASE
+        document.getElementById("professionalRegistrationForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nome = document.getElementById("proName").value;
+            const email = document.getElementById("proEmail").value;
+            const telefone = document.getElementById("proPhone").value;
+            const senha = document.getElementById("proPassword").value;
+            const servico = document.getElementById("proService").value;
+
+            try {
+                // 1. Criar usuário no Auth do Supabase
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: senha,
+                });
+
+                if (authError) throw authError;
+
+                // 2. Salvar dados no perfil
+                const { data: profileData, error: profileError } = await supabase
+                    .from('usuarios')
+                    .insert([
+                        {
+                            id: authData.user.id,
+                            email: email,
+                            nome: nome,
+                            telefone: telefone,
+                            tipo: 'profissional'
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (profileError) throw profileError;
+
+                // 3. Salvar dados específicos do profissional
+                const { error: profError } = await supabase
+                    .from('profissionais')
+                    .insert([
+                        {
+                            id: authData.user.id,
+                            especialidade: servico,
+                            disponivel: true
+                        }
+                    ]);
+
+                if (profError) throw profError;
+
+                alert("Profissional cadastrado com sucesso!");
+                window.location.href = "login.html";
+
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                alert("Erro: " + error.message);
+            }
+        });
+
+        // Menu mobile
+        feather.replace();
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+</body>
+</html>

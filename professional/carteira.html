@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Carteira - Construjá</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="../index.html" class="flex items-center">
+                        <i data-feather="tool" class="text-primary h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">Construjá</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="../index.html" class="text-gray-800 hover:text-primary font-medium">Home</a>
+                    <a href="../profissionais.html" class="text-gray-800 hover:text-primary font-medium">Profissionais</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-800 hover:text-primary font-medium">Dashboard</a>
+                    <a href="#" onclick="logout()" class="text-gray-800 hover:text-primary font-medium">Sair</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Minha Carteira</h1>
+
+        <!-- Balance Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Saldo Disponível -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Saldo Disponível</p>
+                        <h3 class="text-3xl font-bold text-gray-800" id="saldoDisponivel">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i data-feather="dollar-sign" class="text-green-600 w-6 h-6"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Valor disponível para saque</p>
+            </div>
+
+            <!-- Saldo Pendente -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Saldo Pendente</p>
+                        <h3 class="text-3xl font-bold text-gray-800" id="saldoPendente">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i data-feather="clock" class="text-yellow-600 w-6 h-6"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Aguardando confirmação de pagamentos</p>
+            </div>
+
+            <!-- Total Recebido -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Recebido</p>
+                        <h3 class="text-3xl font-bold text-gray-800" id="totalRecebido">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i data-feather="trending-up" class="text-blue-600 w-6 h-6"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Valor total já recebido</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Sacar Fundos -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Sacar Fundos</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Saque</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-500">R$</span>
+                            <input type="number" id="valorSaque" step="0.01" min="10" max="10000"
+                                   placeholder="0,00"
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Valor mínimo: R$ 10,00</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Método de Saque</label>
+                        <select id="metodoSaque" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="pix">PIX</option>
+                            <option value="ted">TED</option>
+                            <option value="doc">DOC</option>
+                        </select>
+                    </div>
+
+                    <!-- PIX Fields -->
+                    <div id="pixFields" class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Chave PIX</label>
+                            <input type="text" id="chavePix" 
+                                   placeholder="CPF, email, telefone ou chave aleatória"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+
+                    <!-- Bank Transfer Fields -->
+                    <div id="bankFields" class="space-y-3 hidden">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Banco</label>
+                                <input type="text" id="banco" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agência</label>
+                                <input type="text" id="agencia" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Conta</label>
+                            <input type="text" id="conta" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+
+                    <button onclick="solicitarSaque()" 
+                            class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-blue-600 transition duration-300 font-medium">
+                        <i data-feather="dollar-sign" class="w-4 h-4 inline mr-2"></i>
+                        Solicitar Saque
+                    </button>
+                </div>
+            </div>
+
+            <!-- Próximos Pagamentos -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Próximos Pagamentos</h3>
+                <div id="proximosPagamentos" class="space-y-3">
+                    <!-- Next payments will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Histórico de Transações</h3>
+                <div class="flex space-x-2">
+                    <select id="transactionFilter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                        <option value="all">Todas as transações</option>
+                        <option value="credito">Créditos</option>
+                        <option value="debito">Débitos</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="transactionHistory" class="space-y-3">
+                <!-- Transactions will be loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyTransactions" class="text-center py-8 hidden">
+                <i data-feather="file-text" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                <p class="text-gray-500">Nenhuma transação encontrada</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Modal -->
+    <div id="withdrawalModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Confirmar Saque</h3>
+                <button onclick="closeWithdrawalModal()" class="text-white hover:text-blue-200">
+                    <i data-feather="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div id="withdrawalDetails" class="mb-6 space-y-3">
+                    <!-- Withdrawal details will be loaded here -->
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-start">
+                        <i data-feather="info" class="text-yellow-500 w-4 h-4 mt-0.5 mr-2"></i>
+                        <div>
+                            <p class="text-sm text-yellow-800 font-medium">Informações Importantes</p>
+                            <ul class="text-xs text-yellow-700 mt-1 list-disc list-inside space-y-1">
+                                <li>Seu saque será processado em até 2 dias úteis</li>
+                                <li>Taxa de transferência: R$ 0,00 (PIX) / R$ 5,00 (TED/DOC)</li>
+                                <li>Valor mínimo para saque: R$ 10,00</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button onclick="closeWithdrawalModal()" 
+                            class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300">
+                        Cancelar
+                    </button>
+                    <button onclick="confirmarSaque()" 
+                            class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
+                        Confirmar Saque
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Configuração do Supabase
+        const supabaseUrl = 'https://ocvkhwtbmpiltjbttsko.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jdmtod3RibXBpbHRqYnR0c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzE5MzgsImV4cCI6MjA3OTg0NzkzOH0.Y6KFqQxs9l2fDziiURjtW3oZr6MWKZPNtyhT5-K7yGw';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let carteira = null;
+        let pendingWithdrawal = null;
+
+        // Inicializar página
+        async function initializePage() {
+            await checkAuth();
+            await loadWalletData();
+            await loadNextPayments();
+            await loadTransactionHistory();
+            setupEventListeners();
+        }
+
+        // Verificar autenticação
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: usuario } = await supabase
+                    .from('usuarios')
+                    .select('nome, tipo')
+                    .eq('id', user.id)
+                    .single();
+                
+                currentUser = usuario;
+
+                if (usuario.tipo !== 'profissional') {
+                    window.location.href = '../cliente/dashboard.html';
+                }
+            } else {
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Carregar dados da carteira
+        async function loadWalletData() {
+            // Buscar carteira
+            const { data: wallet, error } = await supabase
+                .from('carteira')
+                .select('*')
+                .eq('usuario_id', currentUser.id)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('Erro ao carregar carteira:', error);
+                return;
+            }
+
+            carteira = wallet || {
+                saldo: 0,
+                saldo_pendente: 0
+            };
+
+            // Buscar total recebido
+            const { data: transacoes, error: transError } = await supabase
+                .from('transacoes')
+                .select('valor')
+                .eq('profissional_id', currentUser.id)
+                .eq('status', 'concluido');
+
+            if (transError) {
+                console.error('Erro ao carregar transações:', transError);
+                return;
+            }
+
+            const totalRecebido = transacoes.reduce((total, t) => total + parseFloat(t.valor || 0), 0);
+
+            // Atualizar UI
+            document.getElementById('saldoDisponivel').textContent = `R$ ${carteira.saldo.toFixed(2)}`;
+            document.getElementById('saldoPendente').textContent = `R$ ${carteira.saldo_pendente.toFixed(2)}`;
+            document.getElementById('totalRecebido').textContent = `R$ ${totalRecebido.toFixed(2)}`;
+
+            // Atualizar valor máximo do saque
+            document.getElementById('valorSaque').max = carteira.saldo;
+        }
+
+        // Carregar próximos pagamentos
+        async function loadNextPayments() {
+            const { data: pagamentos, error } = await supabase
+                .from('transacoes')
+                .select(`
+                    *,
+                    servico:servicos!inner(titulo),
+                    cliente:usuarios!transacoes_cliente_id_fkey(nome)
+                `)
+                .eq('profissional_id', currentUser.id)
+                .eq('status', 'processando')
+                .order('data_vencimento', { ascending: true })
+                .limit(5);
+
+            if (error) {
+                console.error('Erro ao carregar próximos pagamentos:', error);
+                return;
+            }
+
+            const container = document.getElementById('proximosPagamentos');
+            
+            if (!pagamentos || pagamentos.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <i data-feather="calendar" class="w-8 h-8 mx-auto mb-2"></i>
+                        <p class="text-sm">Nenhum pagamento pendente</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = pagamentos.map(pagamento => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <p class="font-medium text-sm text-gray-800">${pagamento.servico.titulo}</p>
+                            <p class="text-xs text-gray-600">${pagamento.cliente.nome}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-green-600 text-sm">R$ ${parseFloat(pagamento.valor).toFixed(2)}</p>
+                            <p class="text-xs text-gray-500">${pagamento.data_vencimento ? new Date(pagamento.data_vencimento).toLocaleDateString('pt-BR') : 'A definir'}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            feather.replace();
+        }
+
+        // Carregar histórico de transações
+        async function loadTransactionHistory(filter = 'all') {
+            let query = supabase
+                .from('movimentacoes_carteira')
+                .select(`
+                    *,
+                    carteira!inner(usuario_id),
+                    transacao:transacoes(servico:servicos(titulo))
+                `)
+                .eq('carteira.usuario_id', currentUser.id)
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (filter !== 'all') {
+                query = query.eq('tipo', filter);
+            }
+
+            const { data: movimentacoes, error } = await query;
+
+            if (error) {
+                console.error('Erro ao carregar histórico:', error);
+                return;
+            }
+
+            const container = document.getElementById('transactionHistory');
+            const emptyState = document.getElementById('emptyTransactions');
+
+            if (!movimentacoes || movimentacoes.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            container.innerHTML = movimentacoes.map(mov => `
+                <div class="flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50">
+                    <div class="flex items-center space-x-4">
+                        <div class="${mov.tipo === 'credito' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} p-2 rounded-full">
+                            <i data-feather="${mov.tipo === 'credito' ? 'arrow-down-left' : 'arrow-up-right'}" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800 text-sm">
+                                ${mov.descricao}
+                                ${mov.transacao ? ` - ${mov.transacao.servico.titulo}` : ''}
+                            </p>
+                            <p class="text-xs text-gray-500">${new Date(mov.created_at).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold ${mov.tipo === 'credito' ? 'text-green-600' : 'text-red-600'}">
+                            ${mov.tipo === 'credito' ? '+' : '-'} R$ ${mov.valor.toFixed(2)}
+                        </p>
+                        <p class="text-xs text-gray-500">Saldo: R$ ${mov.saldo_atual.toFixed(2)}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            feather.replace();
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Mostrar/ocultar campos baseado no método de saque
+            document.getElementById('metodoSaque').addEventListener('change', function() {
+                const metodo = this.value;
+                const pixFields = document.getElementById('pixFields');
+                const bankFields = document.getElementById('bankFields');
+
+                if (metodo === 'pix') {
+                    pixFields.classList.remove('hidden');
+                    bankFields.classList.add('hidden');
+                } else {
+                    pixFields.classList.add('hidden');
+                    bankFields.classList.remove('hidden');
+                }
+            });
+
+            // Filtrar transações
+            document.getElementById('transactionFilter').addEventListener('change', function() {
+                loadTransactionHistory(this.value);
+            });
+
+            // Validar valor do saque
+            document.getElementById('valorSaque').addEventListener('input', function() {
+                const valor = parseFloat(this.value) || 0;
+                const saldoDisponivel = carteira ? carteira.saldo : 0;
+                
+                if (valor > saldoDisponivel) {
+                    this.setCustomValidity('Valor maior que o saldo disponível');
+                } else if (valor < 10) {
+                    this.setCustomValidity('Valor mínimo: R$ 10,00');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        }
+
+        // Solicitar saque
+        async function solicitarSaque() {
+            const valor = parseFloat(document.getElementById('valorSaque').value);
+            const metodo = document.getElementById('metodoSaque').value;
+            const chavePix = document.getElementById('chavePix')?.value;
+            const banco = document.getElementById('banco')?.value;
+            const agencia = document.getElementById('agencia')?.value;
+            const conta = document.getElementById('conta')?.value;
+
+            // Validações
+            if (!valor || valor < 10) {
+                alert('Valor mínimo para saque é R$ 10,00');
+                return;
+            }
+
+            if (valor > carteira.saldo) {
+                alert('Saldo insuficiente para este saque');
+                return;
+            }
+
+            if (metodo === 'pix' && !chavePix) {
+                alert('Informe a chave PIX para continuar');
+                return;
+            }
+
+            if (metodo !== 'pix' && (!banco || !agencia || !conta)) {
+                alert('Preencha todos os dados bancários');
+                return;
+            }
+
+            // Preparar dados do saque
+            pendingWithdrawal = {
+                valor: valor,
+                metodo: metodo,
+                chavePix: chavePix,
+                dadosBancarios: metodo !== 'pix' ? {
+                    banco: banco,
+                    agencia: agencia,
+                    conta: conta
+                } : null
+            };
+
+            // Mostrar modal de confirmação
+            showWithdrawalModal();
+        }
+
+        // Mostrar modal de confirmação de saque
+        function showWithdrawalModal() {
+            const modal = document.getElementById('withdrawalModal');
+            const details = document.getElementById('withdrawalDetails');
+
+            const taxa = pendingWithdrawal.metodo === 'pix' ? 0 : 5;
+            const valorLiquido = pendingWithdrawal.valor - taxa;
+
+            details.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Valor do saque:</span>
+                    <span class="font-semibold">R$ ${pendingWithdrawal.valor.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Taxa de transferência:</span>
+                    <span class="font-semibold">R$ ${taxa.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-gray-200 pt-2">
+                    <span class="text-gray-800 font-medium">Valor líquido:</span>
+                    <span class="text-green-600 font-bold">R$ ${valorLiquido.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Método:</span>
+                    <span class="font-medium">${getWithdrawalMethodText(pendingWithdrawal.metodo)}</span>
+                </div>
+                ${pendingWithdrawal.metodo === 'pix' ? `
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Chave PIX:</span>
+                        <span class="font-medium text-sm">${pendingWithdrawal.chavePix}</span>
+                    </div>
+                ` : ''}
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        // Fechar modal de saque
+        function closeWithdrawalModal() {
+            document.getElementById('withdrawalModal').classList.add('hidden');
+            pendingWithdrawal = null;
+        }
+
+        // Confirmar saque
+        async function confirmarSaque() {
+            if (!pendingWithdrawal || !carteira) return;
+
+            try {
+                // Criar registro de saque
+                const { data: saque, error } = await supabase
+                    .from('saques')
+                    .insert([{
+                        carteira_id: carteira.id,
+                        valor: pendingWithdrawal.valor,
+                        metodo_saque: pendingWithdrawal.metodo,
+                        chave_pix: pendingWithdrawal.chavePix,
+                        dados_bancarios: pendingWithdrawal.dadosBancarios,
+                        status: 'solicitado'
+                    }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // Atualizar saldo disponível (debitar imediatamente)
+                const { error: updateError } = await supabase
+                    .from('carteira')
+                    .update({
+                        saldo: carteira.saldo - pendingWithdrawal.valor,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', carteira.id);
+
+                if (updateError) throw updateError;
+
+                // Registrar movimentação
+                const { error: movError } = await supabase
+                    .from('movimentacoes_carteira')
+                    .insert([{
+                        carteira_id: carteira.id,
+                        tipo: 'debito',
+                        valor: pendingWithdrawal.valor,
+                        descricao: `Saque solicitado via ${getWithdrawalMethodText(pendingWithdrawal.metodo)}`,
+                        saldo_anterior: carteira.saldo,
+                        saldo_atual: carteira.saldo - pendingWithdrawal.valor
+                    }]);
+
+                if (movError) throw movError;
+
+                alert('Saque solicitado com sucesso! O valor será transferido em até 2 dias úteis.');
+                
+                closeWithdrawalModal();
+                
+                // Limpar formulário
+                document.getElementById('valorSaque').value = '';
+                document.getElementById('chavePix').value = '';
+                
+                // Recarregar dados
+                await loadWalletData();
+                await loadTransactionHistory();
+
+            } catch (error) {
+                console.error('Erro ao solicitar saque:', error);
+                alert('Erro ao solicitar saque. Tente novamente.');
+            }
+        }
+
+        // Utilitários
+        function getWithdrawalMethodText(method) {
+            const texts = {
+                'pix': 'PIX',
+                'ted': 'TED',
+                'doc': 'DOC'
+            };
+            return texts[method] || method;
+        }
+
+        // Logout
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = '../auth/login.html';
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <style>
+        input:invalid {
+            border-color: #f87171;
+        }
+        
+        input:valid {
+            border-color: #10b981;
+        }
+    </style>
+</body>
+</html>
